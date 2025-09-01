@@ -10,6 +10,9 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-charcoal: #36454f;
+  --color-melon: #ff7878;
+  --color-peach: #ffdab9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +26,18 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 0.75rem));
+  }
+}
+
+.animate-scroll {
+  animation: scroll var(--animation-duration, 40s)
+    var(--animation-direction, forwards) linear infinite;
 }
