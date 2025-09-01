@@ -7,7 +7,6 @@ import GridPattern from "./grid-pattern";
 const HeroSection: React.FC = () => {
   return (
     <div className="relative min-h-screen flex flex-col justify-center items-center">
-      {/* Background Pattern - Positioned absolutely */}
       <div className="absolute inset-0">
         <GridPattern />
       </div>

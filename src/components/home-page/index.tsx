@@ -13,7 +13,7 @@ import StatsSection from "./components/stats-section";
 
 const Index = () => {
   return (
-    <div className="min-h-screen font-inter">
+    <div className="min-h-screen font-inter bg-white">
       <Navbar />
       <HeroSection />
       <HowItWorks />
