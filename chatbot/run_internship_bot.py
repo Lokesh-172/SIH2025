@@ -8,10 +8,7 @@ import sys
 from dotenv import load_dotenv
 
 def main():
-    # Load environment variables from .env file
     load_dotenv()
-    
-    # Check if API_KEY environment variable is set
     if not os.getenv("API_KEY"):
         print("Error: API_KEY environment variable is required")
         print("Please set your Google Generative AI API key:")

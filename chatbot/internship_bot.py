@@ -315,11 +315,6 @@ def generate_sample_recommendations(skills: List[str], field_of_study: str) -> L
     
     return recommendations[:3]  # Return top 3 recommendations
 
-@app.get("/health")
-async def health_check():
-    """Health check endpoint."""
-    return {"status": "healthy", "service": "Smart Internship Guidance Bot"}
-
 @app.post("/chat", response_model=ChatResponse)
 async def chat_with_bot(request: ChatRequest):
     """Main chat endpoint for internship guidance."""
