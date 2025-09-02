@@ -10,8 +10,34 @@ export async function POST(request: NextRequest) {
       .toString(36)
       .substr(2, 9)}`;
 
+    // Determine the FastAPI backend URL based on environment
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    let fastApiUrl: string;
+    
+    if (isDevelopment) {
+      // In development, always use localhost
+      fastApiUrl = 'http://localhost:8001';
+    } else {
+      // In production, use environment variable or throw error
+      const productionUrl = process.env.FASTAPI_BASE_URL;
+      if (!productionUrl) {
+        console.error("FASTAPI_BASE_URL environment variable is required in production");
+        throw new Error("FastAPI backend URL not configured for production");
+      }
+      fastApiUrl = productionUrl;
+    }
+
+    console.log("Environment info:", {
+      NODE_ENV: process.env.NODE_ENV,
+      isDevelopment,
+      fastApiUrl: isDevelopment ? fastApiUrl : `${fastApiUrl.substring(0, 20)}...`,
+      hasCustomUrl: !!process.env.FASTAPI_BASE_URL
+    });
+
     // Connect to your existing FastAPI backend
-    const response = await fetch("http://localhost:8001/chat", {
+    console.log(`Attempting to connect to FastAPI at: ${fastApiUrl}/chat`);
+    
+    const response = await fetch(`${fastApiUrl}/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -22,7 +48,12 @@ export async function POST(request: NextRequest) {
         resume_data: resume_data || null,
       }),
     }).catch((error) => {
-      console.log("FastAPI request failed:", error.message);
+      console.log("FastAPI request failed:", {
+        url: `${fastApiUrl}/chat`,
+        error: error.message,
+        isDevelopment,
+        timestamp: new Date().toISOString()
+      });
 
       // Fallback if FastAPI backend is not available
       return null;
@@ -30,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     if (response && response.ok) {
       const data = await response.json();
-      console.log(data);
+      console.log("FastAPI response data:", data);
       console.log("FastAPI response received:", Object.keys(data));
 
       return NextResponse.json({
@@ -41,6 +72,14 @@ export async function POST(request: NextRequest) {
         next_steps: data.next_steps || [],
       });
     } else {
+      console.log("FastAPI response not OK or null:", {
+        hasResponse: !!response,
+        status: response?.status,
+        statusText: response?.statusText,
+        url: `${fastApiUrl}/chat`,
+        fallbackUsed: true
+      });
+      
       // Fallback response when FastAPI backend is not available
       const fallbackResponse = getFallbackResponse(message);
       return NextResponse.json({ response: fallbackResponse });
