@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect,  } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 interface NavbarProps {}
@@ -41,7 +41,7 @@ const Navbar: React.FC<NavbarProps> = () => {
               Contact Us
             </Link>
             <Link
-              href="/contact-us"
+              href="/login"
               className="bg-peach text-black px-6 py-2 rounded-lg hover:bg-opacity-90 font-medium"
             >
               Login

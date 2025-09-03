@@ -10,6 +10,7 @@ import Navbar from "./components/navbar";
 import Testimonials from "./components/testimonials";
 import AlgorithmShowcase from "./components/algorithm-showcase";
 import StatsSection from "./components/stats-section";
+import Companies from "./components/companies";
 
 const Index = () => {
   return (
@@ -19,6 +20,7 @@ const Index = () => {
       <HowItWorks />
       <AlgorithmShowcase />
       <Features />
+      <Companies />
       <StatsSection />
       <Testimonials />
       <FAQs />
