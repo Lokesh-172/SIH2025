@@ -23,16 +23,18 @@ const LoginForm = () => {
     email: '',
     password: ''
   });
-  const [userType, setUserType] = useState('student');
+  const [userType, setUserType] = useState<'student' | 'company'>('student');
 
-  const handleInputChange = (e) => {
+  // Fix 1: Correct type for input change event
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
-  const handleSubmit = (e) => {
+  // Fix 2: Correct type for form submit event
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log('Login attempt:', { ...formData, userType });
     alert('Login attempt logged to console');
@@ -94,7 +96,8 @@ const LoginForm = () => {
 
           {/* Login Form - Enhanced with better styling */}
           <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
-            <div className="space-y-6">
+            {/* Fix 3: Add proper form element with onSubmit */}
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -109,6 +112,7 @@ const LoginForm = () => {
                     onChange={handleInputChange}
                     className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
                     placeholder="Enter your email address"
+                    required
                   />
                 </div>
               </div>
@@ -127,6 +131,7 @@ const LoginForm = () => {
                     onChange={handleInputChange}
                     className="w-full pl-12 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
                     placeholder="Enter your password"
+                    required
                   />
                   <button
                     type="button"
@@ -148,9 +153,9 @@ const LoginForm = () => {
                 </button>
               </div>
 
-              {/* Login Button - Enhanced to match homepage CTA style */}
+              {/* Fix 4: Change onClick to type="submit" for proper form submission */}
               <button
-                onClick={handleSubmit}
+                type="submit"
                 className={`w-full flex items-center justify-center px-6 py-4 rounded-xl text-lg font-semibold shadow-lg transition-all duration-200 hover:transform hover:scale-105 ${
                   userType === 'student'
                     ? 'text-gray-800 bg-orange-200 hover:bg-orange-300 shadow-orange-200/50'
@@ -160,7 +165,7 @@ const LoginForm = () => {
                 {userType === 'student' ? 'Build Your Profile & Find Internships' : 'Post Internship Opportunities'}
                 <ArrowRight className="ml-3 h-5 w-5" />
               </button>
-            </div>
+            </form>
 
             {/* Signup Link */}
             <div className="mt-8 text-center border-t border-gray-100 pt-6">
