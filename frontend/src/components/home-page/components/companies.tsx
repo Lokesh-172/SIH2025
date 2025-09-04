@@ -30,7 +30,7 @@ const Companies = () => {
           containerHeight="sm"
           gap="md"
           rounded="lg"
-          shadow={true}
+          shadow={"md"}
           hoverEffect="scale"
           className="bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200/50"
           maskGradient={true}
