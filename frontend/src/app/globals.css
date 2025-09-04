@@ -34,3 +34,21 @@ body {
   animation: scroll var(--animation-duration, 40s)
     var(--animation-direction, forwards) linear infinite;
 }
+/* Add this to your global CSS file or component styles */
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 0.5rem));
+  }
+}
+
+/* Mask gradient utility for Tailwind v4 */
+@layer utilities {
+  .mask-gradient-to-r {
+    -webkit-mask: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+}
+
