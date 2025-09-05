@@ -54,7 +54,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                 Login
               </Link>
               <Link
-                href="/signup"
+                href="/sign-up"
                 className="bg-peach text-black px-6 py-2 rounded-lg hover:bg-opacity-90 font-medium transition-all duration-200"
               >
                 Sign Up

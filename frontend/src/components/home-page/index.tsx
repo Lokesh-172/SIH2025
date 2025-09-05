@@ -20,7 +20,6 @@ const Index = () => {
       <HowItWorks />
       <AlgorithmShowcase />
       <Features />
-      <Companies />
       <StatsSection />
       <Testimonials />
       <FAQs />

@@ -1,5 +1,6 @@
 import React from "react";
 import { Brain, Target, Users, Globe, Mic, Smartphone } from "lucide-react";
+import Companies from "./companies";
 
 const AlgorithmShowcase = () => {
   return (
@@ -69,47 +70,8 @@ const AlgorithmShowcase = () => {
         </div>
 
         {/* User-Centric Design Features */}
-        <div className="bg-gray-50 p-8 rounded-2xl">
-          <h3 className="text-3xl font-bold text-charcoal mb-8 text-center">
-            Designed for Rural & First-Generation Learners
-          </h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-peach p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Target className="h-8 w-8 text-white" />
-              </div>
-              <h4 className="font-semibold text-charcoal mb-2">
-                Top 3-5 Suggestions
-              </h4>
-              <p className="text-gray-600">
-                No overwhelming lists - just the most relevant matches
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="bg-peach p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Brain className="h-8 w-8 text-white" />
-              </div>
-              <h4 className="font-semibold text-charcoal mb-2">
-                Clear Explanations
-              </h4>
-              <p className="text-gray-600">
-                Understand why each internship is recommended for you
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="bg-peach p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Smartphone className="h-8 w-8 text-white" />
-              </div>
-              <h4 className="font-semibold text-charcoal mb-2">
-                One-Click Apply
-              </h4>
-              <p className="text-gray-600">
-                Simple application process with offline capability
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
+          <Companies/>
     </div>
   );
 };

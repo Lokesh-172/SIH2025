@@ -46,13 +46,12 @@ const ChatBot: React.FC = () => {
       </button>
       {/* Chatbot Window */}
       <div
-        className={`fixed bottom-24 right-5 w-96 h-[700px] bg-white rounded-xl shadow-2xl transition-all duration-300 z-[999] flex flex-col overflow-hidden ${
+        className={`fixed bottom-24 right-5 w-96 md:w-[26rem] h-[42rem] bg-white rounded-xl shadow-2xl transition-all duration-300 z-[999] flex flex-col overflow-hidden ${
           isOpen
             ? "translate-y-0 opacity-100 visible"
             : "translate-y-5 opacity-0 invisible"
         }`}
       >
-        {/* Header */}
         <div className="bg-charcoal text-white p-4 flex justify-between items-center rounded-t-xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-peach flex items-center justify-center text-xl">

@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
     const sessionId = `session_${Date.now()}_${Math.random()
       .toString(36)
       .substr(2, 9)}`;
-
     // Determine the FastAPI backend URL based on environment
     const isDevelopment = process.env.NODE_ENV === 'development';
     let fastApiUrl: string;

@@ -1,5 +1,5 @@
-import LoginPage from "@/components/home-page/pages/login";
+import LoginPage from "@/components/auth-pages/login";
 const Page = () => {
-  return <LoginPage/>;
-}
+  return <LoginPage />;
+};
 export default Page;
