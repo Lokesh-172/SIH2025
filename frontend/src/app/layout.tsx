@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ChatbotProvider } from "@/components/chatbot/context/ChatbotContext";
 import ChatBot from "@/components/chatbot/chatbot";
+import ReduxProvider from "@/components/providers/redux-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,10 +30,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ChatbotProvider>
-          {children}
-          <ChatBot />
-        </ChatbotProvider>
+        <ReduxProvider>
+          <ChatbotProvider>
+            {children}
+            <ChatBot />
+          </ChatbotProvider>
+        </ReduxProvider>
       </body>
     </html>
   );
