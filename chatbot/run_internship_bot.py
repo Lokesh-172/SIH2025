@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 def main():
     load_dotenv()
-    if not os.getenv("API_KEY"):
+    if not os.getenv("GEMINI_API_KEY"):
         print("Error: API_KEY environment variable is required")
         print("Please set your Google Generative AI API key:")
         print("  Windows: set API_KEY=your_api_key_here")
