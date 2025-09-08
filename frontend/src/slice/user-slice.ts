@@ -272,6 +272,8 @@ const userSlice = createSlice({
         state.isAuthenticated = true;
         state.registrationData = {};
         state.error = null;
+        state.currentUserType =
+          action.payload.user.role === "student" ? "student" : "company";
 
         // Store token in localStorage
         if (typeof window !== "undefined") {

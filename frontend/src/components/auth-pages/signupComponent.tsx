@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import { RootState, AppDispatch } from "../../lib/store";
 import {
   setUserType,
@@ -48,7 +49,8 @@ const GridPattern = () => (
 
 const SignupForm = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { registrationData, currentUserType, isLoading, error } = useSelector(
+  const router = useRouter();
+  const { registrationData, currentUserType, isLoading, error, isAuthenticated, user } = useSelector(
     (state: RootState) => state.user
   );
 
@@ -74,6 +76,22 @@ const SignupForm = () => {
     companySize: "",
   });
   const [agreeTerms, setAgreeTerms] = useState(false);
+
+  // Redirect user after successful registration
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const redirectPath =
+        user.role === "company" ? "/company/dashboard" : "/user/dashboard";
+      router.push(redirectPath);
+    }
+  }, [isAuthenticated, user, router]);
+
+  // Clear error when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
 
   // Update form data when Redux state changes
   useEffect(() => {
@@ -264,28 +282,23 @@ const SignupForm = () => {
 
     try {
       // Dispatch the registration action
-      const result = await dispatch(registerUser(formData));
+      await dispatch(registerUser(formData)).unwrap();
       
-      if (registerUser.fulfilled.match(result)) {
-        alert(
-          `Registration successful! Welcome to InternMatch!${
-            formData.resume ? " Your resume has been uploaded successfully." : ""
-          }${formData.avatar ? " Your profile picture has been uploaded." : ""}`
-        );
-        
-        // Clear form data after successful registration
-        dispatch(clearRegistrationData());
-        setAgreeTerms(false);
-        
-        // Optionally redirect to dashboard or login page
-        // router.push('/dashboard');
-      } else {
-        // Handle registration error
-        alert(result.payload || "Registration failed. Please try again.");
-      }
+      // Success message
+      alert(
+        `Registration successful! Welcome to InternMatch!${
+          formData.resume ? " Your resume has been uploaded successfully." : ""
+        }${formData.avatar ? " Your profile picture has been uploaded." : ""}`
+      );
+      
+      // Clear form data after successful registration
+      dispatch(clearRegistrationData());
+      setAgreeTerms(false);
+      
+      // Navigation is handled by useEffect after successful registration
     } catch (error: any) {
-      alert("Registration failed. Please try again.");
-      console.error("Registration error:", error);
+      // Error is handled by Redux state
+      console.error("Registration failed:", error);
     }
   };
 
@@ -301,7 +314,10 @@ const SignupForm = () => {
           <div className="text-2xl font-bold text-gray-800">InternMatch</div>
           <div className="text-sm text-gray-600">
             Already have an account?{" "}
-            <button className="text-gray-800 hover:text-gray-600 font-medium">
+            <button 
+              onClick={() => router.push('/login')}
+              className="text-gray-800 hover:text-gray-600 font-medium"
+            >
               Sign In
             </button>
           </div>
@@ -856,7 +872,10 @@ const SignupForm = () => {
             <div className="mt-8 text-center border-t border-gray-100 pt-6">
               <p className="text-gray-600">
                 Already have an account?{" "}
-                <button className="text-gray-800 font-semibold hover:text-gray-600 transition-colors">
+                <button 
+                  onClick={() => router.push('/login')}
+                  className="text-gray-800 font-semibold hover:text-gray-600 transition-colors"
+                >
                   Sign in here
                 </button>
               </p>

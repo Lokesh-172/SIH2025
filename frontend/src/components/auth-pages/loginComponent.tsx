@@ -315,7 +315,10 @@ const LoginForm = () => {
             <div className="mt-8 text-center border-t border-gray-100 pt-6">
               <p className="text-gray-600">
                 Don't have an account yet?{" "}
-                <button className="text-gray-800 font-semibold hover:text-gray-600 transition-colors">
+                <button 
+                  onClick={() => router.push('/sign-up')}
+                  className="text-gray-800 font-semibold hover:text-gray-600 transition-colors"
+                >
                   Create your account
                 </button>
               </p>
