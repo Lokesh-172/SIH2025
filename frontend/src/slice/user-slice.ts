@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { authenticateUser } from "@/data/mockLoginCredentials";
 
 export interface User {
   id: string;
@@ -56,6 +57,7 @@ interface UserState {
   token: string | null;
   registrationData: Partial<RegistrationData>;
   currentUserType: "student" | "company";
+  loginLoading: boolean;
 }
 
 const initialState: UserState = {
@@ -66,7 +68,35 @@ const initialState: UserState = {
   token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
   registrationData: {},
   currentUserType: "student",
+  loginLoading: false,
 };
+
+// Async action for user login
+export const loginUser = createAsyncThunk(
+  "user/login",
+  async (
+    loginData: { email: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const credential = authenticateUser(loginData.email, loginData.password);
+
+      if (!credential) {
+        return rejectWithValue("Invalid email or password");
+      }
+
+      // Simulate token generation
+      const token = `auth_token_${credential.user.id}_${Date.now()}`;
+
+      return { user: credential.user, token };
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Login failed");
+    }
+  }
+);
 
 // Async action for user registration
 export const registerUser = createAsyncThunk(
@@ -207,6 +237,30 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Login user cases
+      .addCase(loginUser.pending, (state) => {
+        state.loginLoading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loginLoading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.error = null;
+        state.currentUserType =
+          action.payload.user.role === "student" ? "student" : "company";
+
+        // Store token in localStorage
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", action.payload.token);
+        }
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loginLoading = false;
+        state.error = action.payload as string;
+      })
+      // Register user cases
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;

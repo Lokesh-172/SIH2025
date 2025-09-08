@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
@@ -20,18 +22,6 @@ const Navbar: React.FC<NavbarProps> = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/dashboard"
-              className="text-charcoal hover:text-peach transition-colors duration-100"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/internships"
-              className="text-charcoal hover:text-peach transition-colors duration-100"
-            >
-              Browse Internships
-            </Link>
             <Link
               href="/about"
               className="text-charcoal hover:text-peach transition-colors duration-100"
