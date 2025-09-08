@@ -7,6 +7,8 @@ import re
 import os
 from typing import List, Dict, Optional, Union
 from datetime import datetime
+from dotenv import dotenv_values
+config = dotenv_values(".env") 
 
 # Initialize FastAPI app
 app = FastAPI(title="Smart Internship Guidance Bot", version="1.0.0")
@@ -21,7 +23,7 @@ app.add_middleware(
 )
 
 # Get API key from environment variable
-api_key = os.getenv("API_KEY")
+api_key = config.get("GEMINI_API_KEY")
 if not api_key:
     raise RuntimeError("API_KEY environment variable is required")
 
@@ -220,7 +222,17 @@ def get_internship_guidance_prompt(user_message: str, resume_data: Optional[Resu
         """
     
     prompt = f"""
-    You are an expert Internship Guidance Counselor specializing in helping students, especially first-generation learners and candidates from rural/tribal areas, find suitable internships and build their careers.
+    You are a helpful career guidance assistant for the Smart Internship Guidance Bot.
+
+    When answering, do NOT restate or repeat the user's question.
+    Start directly with the answer or advice.
+    Keep the tone natural and conversational (like a person, not a list).
+    Be clear and concise — focus on the key information and actionable tips.
+    Avoid filler phrases like “Hi there” or “It's great you're asking this”.
+    Write answers in one or two short paragraphs, maximum.
+    Do NOT recommend external websites or portals (LinkedIn, Glassdoor, etc.).
+    Always direct the user to explore internship opportunities through the PMIS (PM Internship Scheme) website only, and mention that they can also check the “most recommended jobs” tailored to their profile on PMIS.
+
 
     {resume_context}
 
