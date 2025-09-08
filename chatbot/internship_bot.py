@@ -7,8 +7,10 @@ import re
 import os
 from typing import List, Dict, Optional, Union
 from datetime import datetime
-from dotenv import dotenv_values
-config = dotenv_values(".env") 
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (for local development)
+load_dotenv()
 
 # Initialize FastAPI app
 app = FastAPI(title="Smart Internship Guidance Bot", version="1.0.0")
@@ -22,10 +24,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Get API key from environment variable
-api_key = config.get("GEMINI_API_KEY")
+# Get API key from environment variable (works for both local .env and Render environment variables)
+api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
-    raise RuntimeError("API_KEY environment variable is required")
+    raise RuntimeError("GEMINI_API_KEY environment variable is required")
 
 genai.configure(api_key=api_key)
 
@@ -501,4 +503,6 @@ async def get_internship_tips():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001, reload=True)
+    # Get port from environment variable (Render provides this) or default to 8001
+    port = int(os.getenv("PORT", 8001))
+    uvicorn.run(app, host="0.0.0.0", port=port, reload=False)
