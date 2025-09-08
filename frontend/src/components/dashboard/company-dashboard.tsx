@@ -58,7 +58,7 @@ const CompanyDashboard = () => {
               </span>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="flex items-center px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
+              <button className="flex items-center px-4 py-2 bg-peach text-charcoal rounded-lg cursor-pointer hover:bg-dark-peach transition-colors">
                 <Plus className="h-4 w-4 mr-2" />
                 Post Job
               </button>
@@ -67,7 +67,7 @@ const CompanyDashboard = () => {
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:text-gray-900 transition-colors"
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:text-gray-900 transition-colors cursor-pointer"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -198,7 +198,7 @@ const CompanyDashboard = () => {
                 <h3 className="text-lg font-medium text-gray-900">
                   Job Postings
                 </h3>
-                <button className="flex items-center px-4 py-2 text-sm bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors">
+                <button className="flex items-center px-4 py-2 text-sm bg-peach text-charcoal rounded-lg cursor-pointer hover:bg-dark-peach transition-colors">
                   <Plus className="h-4 w-4 mr-2" />
                   Create New
                 </button>

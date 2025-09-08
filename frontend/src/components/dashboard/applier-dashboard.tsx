@@ -153,11 +153,11 @@ const ApplierDashboard = () => {
           {/* Dashboard Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Welcome Section */}
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-sm p-6 text-white">
+            <div className="bg-peach rounded-lg shadow-sm p-6 text-charcoal">
               <h1 className="text-2xl font-bold mb-2">
                 Welcome back, {user.name.split(" ")[0]}! 👋
               </h1>
-              <p className="text-orange-100">
+              <p className="text-charcoal">
                 Ready to discover exciting internship opportunities? Let's get
                 you matched with the perfect role.
               </p>
