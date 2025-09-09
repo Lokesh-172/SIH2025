@@ -30,6 +30,7 @@ import {
   Camera,
   Plus,
 } from "lucide-react";
+import ResumeBuilder from '../resume/ResumeBuilder'; // Adjust path as needed
 
 // Enhanced GridPattern to match the homepage subtle background
 const GridPattern = () => (
@@ -56,6 +57,7 @@ const SignupForm = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showResumeBuilder, setShowResumeBuilder] = useState(false); // NEW STATE
   const [formData, setFormData] = useState<RegistrationData>({
     fullName: "",
     email: "",
@@ -154,6 +156,85 @@ const SignupForm = () => {
     
     // Update Redux state
     dispatch(updateRegistrationData(updatedFormData));
+  };
+
+  // NEW FUNCTION: Handle resume creation from Resume Builder
+  const handleResumeCreated = (resumeData: any) => {
+    // Convert resume data to PDF file
+    const resumeContent = generateResumeContent(resumeData);
+    const blob = new Blob([resumeContent], { type: 'application/pdf' });
+    const fileName = `${resumeData.personalInfo?.fullName?.replace(/\s+/g, '_') || 'resume'}.pdf`;
+    const file = new File([blob], fileName, { type: 'application/pdf' });
+    
+    // Update form data with created resume
+    const updatedFormData = {
+      ...formData,
+      resume: file,
+    };
+    
+    setFormData(updatedFormData);
+    dispatch(updateRegistrationData(updatedFormData));
+    
+    // Close resume builder
+    setShowResumeBuilder(false);
+    
+    // Show success message
+    alert(`✅ Resume created successfully! "${fileName}" has been added to your profile.`);
+  };
+
+  // NEW FUNCTION: Generate resume content from resume data
+  const generateResumeContent = (resumeData: any) => {
+    const { personalInfo, careerObjective, education, workExperience, skills, projects } = resumeData;
+    
+    return `
+RESUME - ${personalInfo?.fullName || 'Your Name'}
+
+CONTACT INFORMATION
+Email: ${personalInfo?.email || ''}
+Phone: ${personalInfo?.phone || ''}
+Address: ${personalInfo?.address || ''}
+${personalInfo?.linkedIn ? `LinkedIn: ${personalInfo.linkedIn}` : ''}
+${personalInfo?.github ? `GitHub: ${personalInfo.github}` : ''}
+${personalInfo?.portfolio ? `Portfolio: ${personalInfo.portfolio}` : ''}
+
+${careerObjective ? `CAREER OBJECTIVE
+${careerObjective}
+
+` : ''}${education?.length > 0 ? `EDUCATION
+${education.map((edu: any) => `
+${edu.degree} ${edu.specialization ? `in ${edu.specialization}` : ''}
+${edu.institution} ${edu.location ? `- ${edu.location}` : ''}
+${edu.startYear} - ${edu.endYear}
+${edu.cgpa ? `CGPA: ${edu.cgpa}` : ''}${edu.percentage ? ` | Percentage: ${edu.percentage}%` : ''}
+${edu.achievements?.length > 0 ? `Achievements: ${edu.achievements.join('; ')}` : ''}
+`).join('')}
+
+` : ''}${workExperience?.length > 0 ? `WORK EXPERIENCE
+${workExperience.map((work: any) => `
+${work.position} - ${work.company} (${work.type?.toUpperCase()})
+${work.location || ''} | ${work.startDate} - ${work.isCurrentlyWorking ? 'Present' : work.endDate}
+${work.description?.length > 0 ? `• ${work.description.join('\n• ')}` : ''}
+${work.technologies?.length > 0 ? `Technologies: ${work.technologies.join(', ')}` : ''}
+`).join('')}
+
+` : ''}${skills?.length > 0 ? `SKILLS
+${skills.map((skillGroup: any) => `
+${skillGroup.category} (${skillGroup.proficiencyLevel || 'Intermediate'}):
+${skillGroup.skills?.join(', ') || ''}
+`).join('')}
+
+` : ''}${projects?.length > 0 ? `PROJECTS
+${projects.map((project: any) => `
+${project.title} (${project.type?.charAt(0)?.toUpperCase() + project.type?.slice(1)} Project)
+${project.description}
+${project.technologies?.length > 0 ? `Technologies: ${project.technologies.join(', ')}` : ''}
+${project.githubLink ? `GitHub: ${project.githubLink}` : ''}
+${project.liveLink ? `Live Demo: ${project.liveLink}` : ''}
+${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.join('; ')}` : ''}
+`).join('')}
+
+` : ''}Generated via InternMatch Resume Builder
+    `.trim();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -608,7 +689,7 @@ const SignupForm = () => {
                     </select>
                   </div>
 
-                  {/* Resume Upload */}
+                  {/* ENHANCED Resume Upload Section */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                       Resume/CV (PDF only)
@@ -633,10 +714,7 @@ const SignupForm = () => {
                                 {formData.resume.name}
                               </p>
                               <p className="text-xs text-gray-600">
-                                {(formData.resume.size / (1024 * 1024)).toFixed(
-                                  2
-                                )}{" "}
-                                MB
+                                {(formData.resume.size / (1024 * 1024)).toFixed(2)} MB
                               </p>
                             </div>
                           </div>
@@ -658,24 +736,51 @@ const SignupForm = () => {
                           </div>
                         </div>
                       ) : (
-                        // Show upload area
-                        <label
-                          htmlFor="resume"
-                          className="w-full flex items-center justify-center px-4 py-6 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 cursor-pointer group"
-                        >
-                          <div className="text-center">
-                            <Upload className="mx-auto h-8 w-8 text-gray-400 group-hover:text-orange-500 mb-2 transition-colors" />
-                            <p className="text-sm font-medium text-gray-700 mb-1">
-                              Upload your resume
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              PDF only, max 5MB
-                            </p>
-                            <p className="text-xs text-orange-600 mt-2">
-                              Click to browse files
-                            </p>
+                        // Show upload/create options
+                        <div className="space-y-3">
+                          {/* Upload existing resume option */}
+                          <label
+                            htmlFor="resume"
+                            className="w-full flex items-center justify-center px-4 py-6 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 cursor-pointer group"
+                          >
+                            <div className="text-center">
+                              <Upload className="mx-auto h-8 w-8 text-gray-400 group-hover:text-orange-500 mb-2 transition-colors" />
+                              <p className="text-sm font-medium text-gray-700 mb-1">
+                                Upload your resume
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                PDF only, max 5MB
+                              </p>
+                            </div>
+                          </label>
+
+                          {/* OR divider */}
+                          <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                              <div className="w-full border-t border-gray-200" />
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                              <span className="px-4 bg-white text-gray-500">or</span>
+                            </div>
                           </div>
-                        </label>
+
+                          {/* CREATE RESUME BUTTON - NEW ADDITION */}
+                          <button
+                            type="button"
+                            onClick={() => setShowResumeBuilder(true)}
+                            className="w-full flex items-center justify-center px-4 py-6 bg-gradient-to-r from-orange-100 to-orange-200 border-2 border-orange-200 rounded-xl hover:from-orange-200 hover:to-orange-300 transition-all duration-200 group"
+                          >
+                            <div className="text-center">
+                              <Plus className="mx-auto h-8 w-8 text-orange-600 group-hover:text-orange-700 mb-2 transition-colors" />
+                              <p className="text-sm font-medium text-orange-800 mb-1">
+                                Create Resume Now
+                              </p>
+                              <p className="text-xs text-orange-600">
+                                Build a professional resume in minutes
+                              </p>
+                            </div>
+                          </button>
+                        </div>
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
@@ -810,9 +915,7 @@ const SignupForm = () => {
                     />
                     <button
                       type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       {showConfirmPassword ? (
@@ -929,6 +1032,30 @@ const SignupForm = () => {
           </div>
         </div>
       </div>
+
+      {/* RESUME BUILDER MODAL - NEW ADDITION */}
+      {showResumeBuilder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">Create Your Resume</h2>
+              <button
+                onClick={() => setShowResumeBuilder(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="h-6 w-6 text-gray-500" />
+              </button>
+            </div>
+            <div className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 80px)' }}>
+              <ResumeBuilder 
+                onResumeComplete={handleResumeCreated}
+                onCancel={() => setShowResumeBuilder(false)}
+                isModal={true}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
