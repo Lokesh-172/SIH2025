@@ -1,5 +1,5 @@
 import os
-import fitz  # PyMuPDF
+import fitz  
 import requests
 import uvicorn
 from fastapi import FastAPI, UploadFile, File, HTTPException, status
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # --- Environment & API Configuration ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY environment variable not set. Please create a .env file and add it.")
+    raise ValueError("GEMINI_API_KEY environment variable not set. Please provide it in the deployment environment.")
 
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={GEMINI_API_KEY}"
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
@@ -137,7 +137,7 @@ async def analyze_resume(resume: UploadFile = File(...)):
 
 # --- Main entry point for running the server ---
 if __name__ == '__main__':
-    # This block allows running the app directly with `python app.py` for development.
-    # Uvicorn is the standard ASGI server for FastAPI.
-    uvicorn.run(app, host="127.0.0.1", port=5001)
+    # This block is for local development. Render will use the Start Command instead.
+    # The host is set to "0.0.0.0" to be accessible within a container.
+    uvicorn.run(app, host="0.0.0.0", port=5001)
 
