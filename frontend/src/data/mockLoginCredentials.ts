@@ -1,3 +1,5 @@
+import { ResumeAnalysis, QuizResult } from "@/slice/user-slice";
+
 // Mock login credentials for demo purposes
 export interface LoginCredential {
   email: string;
@@ -19,6 +21,8 @@ export interface LoginCredential {
       experience?: string;
       education?: string;
       resume?: string;
+      resumeAnalysis?: ResumeAnalysis;
+      quizResults?: QuizResult[];
       // Student specific fields
       college?: string;
       course?: string;
@@ -64,6 +68,92 @@ export const mockLoginCredentials: LoginCredential[] = [
         course: "Computer Science",
         graduationYear: "2025",
         resume: "john_doe_resume.pdf",
+        resumeAnalysis: {
+          score: 85,
+          overall_feedback:
+            "Your resume shows strong technical skills and relevant experience. The ATS system can easily parse your information, and your qualifications align well with typical software engineering positions. Consider adding more specific achievements with quantifiable results to further improve your score.",
+          detailed_feedback: [
+            {
+              section: "Contact Information",
+              feedback:
+                "Contact information is complete and well-formatted. Email and phone number are clearly visible.",
+              suggestions: [
+                "Consider adding a LinkedIn profile URL",
+                "Include your location (city, state) for better local job matching",
+              ],
+            },
+            {
+              section: "Skills",
+              feedback:
+                "Strong technical skills section with relevant programming languages and frameworks. Skills are well-organized and use industry-standard terminology.",
+              suggestions: [
+                "Group skills by category (Programming Languages, Frameworks, Tools)",
+                "Add proficiency levels for key skills",
+                "Include certifications if applicable",
+              ],
+            },
+            {
+              section: "Education",
+              feedback:
+                "Educational background is relevant and properly formatted. Degree and institution are clearly mentioned.",
+              suggestions: [
+                "Include GPA if above 3.5",
+                "Add relevant coursework for recent graduates",
+                "Include academic projects or honors",
+              ],
+            },
+          ],
+          quiz_questions_with_answers: [
+            {
+              question:
+                "Which of the following is a JavaScript framework commonly used for building user interfaces?",
+              options: ["Django", "React", "Flask", "Laravel"],
+              correct_answer: "React",
+            },
+            {
+              question: "What does HTML stand for?",
+              options: [
+                "Hyper Text Markup Language",
+                "High Tech Modern Language",
+                "Home Tool Markup Language",
+                "Hyperlink and Text Markup Language",
+              ],
+              correct_answer: "Hyper Text Markup Language",
+            },
+            {
+              question:
+                "In Python, which data structure is ordered and changeable?",
+              options: ["Tuple", "Set", "List", "Dictionary"],
+              correct_answer: "List",
+            },
+            {
+              question: "What is the purpose of the 'useState' hook in React?",
+              options: [
+                "To manage component state",
+                "To handle API calls",
+                "To style components",
+                "To optimize performance",
+              ],
+              correct_answer: "To manage component state",
+            },
+            {
+              question: "Which of the following is NOT a valid HTTP method?",
+              options: ["GET", "POST", "PUT", "FETCH"],
+              correct_answer: "FETCH",
+            },
+          ],
+          analyzedAt: "2025-09-10T14:30:00Z",
+        },
+        quizResults: [
+          {
+            score: 92,
+            totalQuestions: 5,
+            correctAnswers: 4,
+            timeTaken: 180, // 3 minutes
+            completedAt: "2025-09-11T10:15:00Z",
+            quizType: "resume" as const,
+          },
+        ],
       },
     },
   },

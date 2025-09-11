@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { RootState, AppDispatch } from "@/lib/store";
-import { logout } from "@/slice/user-slice";
+import { logout, saveQuizResult } from "@/slice/user-slice";
 import {
   User,
   Mail,
@@ -45,8 +45,10 @@ import {
   Trophy,
 } from "lucide-react";
 
-// Import Quiz component (assuming it's in a separate file)
-import Quiz from "../quiz/quiz"; // Adjust the path as needed
+// Import Quiz components
+import Quiz from "../quiz/quiz";
+import ResumeQuiz from "../quiz/ResumeQuiz";
+import ResumeAnalysisModal from "./ResumeAnalysisModal";
 
 const ApplierDashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -58,6 +60,7 @@ const ApplierDashboard = () => {
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [appliedJobs, setAppliedJobs] = useState<string[]>(["1"]);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [showResumeAnalysis, setShowResumeAnalysis] = useState(false);
 
   // Sample quiz questions for skills assessment
   const quizQuestions = [
@@ -68,41 +71,34 @@ const ApplierDashboard = () => {
         "To replace class components entirely",
         "To manage state and lifecycle in functional components",
         "To improve performance of React applications",
-        "To handle routing in React applications"
+        "To handle routing in React applications",
       ],
       correctAnswer: 1,
       difficulty: "medium" as const,
       category: "React",
-      explanation: "React Hooks allow you to use state and other React features in functional components."
+      explanation:
+        "React Hooks allow you to use state and other React features in functional components.",
     },
     {
       id: 2,
       question: "Which of the following is NOT a valid JavaScript data type?",
-      options: [
-        "undefined",
-        "boolean",
-        "float",
-        "symbol"
-      ],
+      options: ["undefined", "boolean", "float", "symbol"],
       correctAnswer: 2,
       difficulty: "easy" as const,
       category: "JavaScript",
-      explanation: "JavaScript doesn't have a specific 'float' data type. Numbers are all of type 'number'."
+      explanation:
+        "JavaScript doesn't have a specific 'float' data type. Numbers are all of type 'number'.",
     },
     {
       id: 3,
       question: "What is the time complexity of binary search?",
-      options: [
-        "O(1)",
-        "O(log n)",
-        "O(n)",
-        "O(n log n)"
-      ],
+      options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
       correctAnswer: 1,
       difficulty: "hard" as const,
       category: "Data Structures",
-      explanation: "Binary search has O(log n) time complexity because it divides the search space in half."
-    }
+      explanation:
+        "Binary search has O(log n) time complexity because it divides the search space in half.",
+    },
   ];
 
   // Mock recommended jobs data
@@ -140,7 +136,7 @@ const ApplierDashboard = () => {
       postedDays: 1,
       description:
         "Work on real-world data science projects and gain hands-on experience with ML algorithms.",
-      isHot: true,
+      isHot: false,
       isApplied: false,
       matchScore: 88,
     },
@@ -203,10 +199,27 @@ const ApplierDashboard = () => {
     }
   };
 
-  const handleQuizComplete = (score: number, answers: number[], timeTaken: number) => {
+  const handleQuizComplete = (
+    score: number,
+    answers: number[],
+    timeTaken: number
+  ) => {
     console.log("Quiz completed!", { score, answers, timeTaken });
+
+    // Save quiz result to Redux store
+    const quizResult = {
+      score,
+      totalQuestions: answers.length,
+      correctAnswers: Math.round((score / 100) * answers.length),
+      timeTaken,
+      completedAt: new Date().toISOString(),
+      quizType: (user?.profile?.resumeAnalysis?.quiz_questions_with_answers
+        ? "resume"
+        : "skills") as "skills" | "resume",
+    };
+
+    dispatch(saveQuizResult(quizResult));
     setShowQuiz(false);
-    // You can add logic here to save the quiz results to the user's profile
     alert(`Quiz completed! Your score: ${score}%`);
   };
 
@@ -229,16 +242,23 @@ const ApplierDashboard = () => {
 
   // Show Quiz if active
   if (showQuiz) {
-    return (
-      <Quiz
-        title="Skills Assessment Quiz"
-        description="Boost your profile with a skills assessment to get better job matches"
-        questions={quizQuestions}
-        timeLimit={15}
-        onComplete={handleQuizComplete}
-        onClose={handleQuizClose}
-      />
-    );
+    // Use ResumeQuiz if resume analysis is available, otherwise use default Quiz
+    if (user?.profile?.resumeAnalysis?.quiz_questions_with_answers) {
+      return (
+        <ResumeQuiz onComplete={handleQuizComplete} onClose={handleQuizClose} />
+      );
+    } else {
+      return (
+        <Quiz
+          title="Skills Assessment Quiz"
+          description="Boost your profile with a skills assessment to get better job matches"
+          questions={quizQuestions}
+          timeLimit={15}
+          onComplete={handleQuizComplete}
+          onClose={handleQuizClose}
+        />
+      );
+    }
   }
 
   return (
@@ -253,9 +273,7 @@ const ApplierDashboard = () => {
                   <Briefcase className="h-7 w-7 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    DISHA
-                  </h1>
+                  <h1 className="text-2xl font-bold text-gray-900">DISHA</h1>
                   <span className="text-sm text-gray-600 font-medium">
                     Student Portal
                   </span>
@@ -269,7 +287,10 @@ const ApplierDashboard = () => {
                 className="flex items-center px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl group"
               >
                 <Brain className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-                Take Skills Quiz
+                {user.profile?.quizResults &&
+                user.profile.quizResults.length > 0
+                  ? "Retake Quiz"
+                  : "Take Skills Quiz"}
               </button>
               <button className="relative p-3 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:bg-gray-100 rounded-xl">
                 <Bell className="h-5 w-5" />
@@ -368,14 +389,18 @@ const ApplierDashboard = () => {
                       <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
                         <Building className="h-4 w-4 text-gray-600" />
                       </div>
-                      <span className="font-medium">{user.profile.college}</span>
+                      <span className="font-medium">
+                        {user.profile.college}
+                      </span>
                     </div>
                     {user.profile.course && (
                       <div className="flex items-center p-3 rounded-xl hover:bg-gray-50 transition-colors group">
                         <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
                           <BookOpen className="h-4 w-4 text-gray-600" />
                         </div>
-                        <span className="font-medium">{user.profile.course}</span>
+                        <span className="font-medium">
+                          {user.profile.course}
+                        </span>
                       </div>
                     )}
                     {user.profile.graduationYear && (
@@ -383,13 +408,92 @@ const ApplierDashboard = () => {
                         <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
                           <Calendar className="h-4 w-4 text-gray-600" />
                         </div>
-                        <span className="font-medium">Class of {user.profile.graduationYear}</span>
+                        <span className="font-medium">
+                          Class of {user.profile.graduationYear}
+                        </span>
                       </div>
                     )}
                   </div>
                 </div>
               )}
             </div>
+
+            {/* Resume Score Section */}
+            {user.profile?.resumeAnalysis && (
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl shadow-lg border border-green-200/50 p-6 hover:shadow-xl transition-all duration-300">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                    <Award className="h-4 w-4 text-green-600" />
+                  </div>
+                  Resume ATS Score
+                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <div className="text-3xl font-bold text-green-600 mr-2">
+                      {user.profile.resumeAnalysis.score}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <div>/ 100</div>
+                      <div className="text-xs">ATS Score</div>
+                    </div>
+                  </div>
+                  <div
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      user.profile.resumeAnalysis.score >= 80
+                        ? "bg-green-100 text-green-700"
+                        : user.profile.resumeAnalysis.score >= 60
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {user.profile.resumeAnalysis.score >= 80
+                      ? "Excellent"
+                      : user.profile.resumeAnalysis.score >= 60
+                      ? "Good"
+                      : "Needs Improvement"}
+                  </div>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                  <div
+                    className={`h-2 rounded-full transition-all duration-500 ${
+                      user.profile.resumeAnalysis.score >= 80
+                        ? "bg-green-500"
+                        : user.profile.resumeAnalysis.score >= 60
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                    }`}
+                    style={{ width: `${user.profile.resumeAnalysis.score}%` }}
+                  ></div>
+                </div>
+                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                  {user.profile.resumeAnalysis.overall_feedback}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowQuiz(true)}
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center group"
+                  >
+                    <Brain className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
+                    {user.profile?.quizResults &&
+                    user.profile.quizResults.length > 0
+                      ? "Retake Quiz"
+                      : "Take Skills Quiz"}
+                  </button>
+                  <button
+                    onClick={() => setShowResumeAnalysis(true)}
+                    className="px-4 py-2 bg-white text-green-600 border border-green-200 rounded-xl text-sm font-medium hover:bg-green-50 transition-colors"
+                  >
+                    View Details
+                  </button>
+                </div>
+                <div className="text-xs text-gray-500 mt-3">
+                  Analyzed on{" "}
+                  {new Date(
+                    user.profile.resumeAnalysis.analyzedAt
+                  ).toLocaleDateString()}
+                </div>
+              </div>
+            )}
 
             {/* About Section */}
             {user.profile?.bio && (
@@ -437,7 +541,7 @@ const ApplierDashboard = () => {
                 Quick Actions
               </h3>
               <div className="space-y-3">
-                <button 
+                <button
                   onClick={() => setShowQuiz(true)}
                   className="w-full flex items-center justify-between px-4 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl group"
                 >
@@ -484,7 +588,8 @@ const ApplierDashboard = () => {
                   Boost Your Profile
                 </h3>
                 <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-                  Take our skills assessment quiz to get better job matches and showcase your abilities to employers.
+                  Take our skills assessment quiz to get better job matches and
+                  showcase your abilities to employers.
                 </p>
                 <button
                   onClick={() => setShowQuiz(true)}
@@ -511,18 +616,75 @@ const ApplierDashboard = () => {
                       Welcome back, {user.name.split(" ")[0]}!
                       <Sparkles className="ml-3 h-6 w-6 text-yellow-400" />
                     </h1>
-                    <p className="text-gray-300 text-lg leading-relaxed mb-4">
+                    <p className="text-gray-300 text-lg leading-relaxed mb-6">
                       Ready to discover exciting internship opportunities? Let's
                       get you matched with the perfect role.
                     </p>
-                    <button
-                      onClick={() => setShowQuiz(true)}
-                      className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-2xl font-medium hover:bg-white/30 transition-all duration-200 border border-white/20"
-                    >
-                      <Brain className="h-4 w-4 mr-2" />
-                      Take Skills Quiz
-                      <ChevronRight className="h-4 w-4 ml-2" />
-                    </button>
+                    <div className="flex items-center space-x-4">
+                      {/* Resume Score Display */}
+                      {user.profile?.resumeAnalysis && (
+                        <div className="flex items-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-sm">
+                          <div className="flex items-center">
+                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
+                              <Award className="h-5 w-5 text-white" />
+                            </div>
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-lg font-bold text-white">
+                                  {user.profile.resumeAnalysis.score}
+                                </span>
+                                <span className="text-sm text-gray-300">
+                                  /100
+                                </span>
+                              </div>
+                              <span className="text-xs text-gray-400 font-medium">
+                                ATS Score
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Quiz Score Display */}
+                      {user.profile?.quizResults &&
+                        user.profile.quizResults.length > 0 && (
+                          <div className="flex items-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-sm">
+                            <div className="flex items-center">
+                              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
+                                <Trophy className="h-5 w-5 text-white" />
+                              </div>
+                              <div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-lg font-bold text-white">
+                                    {
+                                      user.profile.quizResults[
+                                        user.profile.quizResults.length - 1
+                                      ].score
+                                    }
+                                    %
+                                  </span>
+                                </div>
+                                <span className="text-xs text-gray-400 font-medium">
+                                  Quiz Score
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                      {/* Skills Assessment Button */}
+                      <button
+                        onClick={() => setShowQuiz(true)}
+                        className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-2xl font-medium hover:bg-white/30 transition-all duration-200 border border-white/20"
+                      >
+                        <Brain className="h-4 w-4 mr-2" />
+                        {user.profile?.quizResults &&
+                        user.profile.quizResults.length > 0
+                          ? "Retake Quiz"
+                          : "Take Skills Quiz"}
+                        <ChevronRight className="h-4 w-4 ml-2" />
+                      </button>
+                    </div>
                   </div>
                   <div className="hidden md:block">
                     <Target className="h-20 w-20 text-white/20" />
@@ -540,7 +702,7 @@ const ApplierDashboard = () => {
                   icon: Target,
                   color: "bg-blue-500",
                   bgColor: "bg-blue-50",
-                  textColor: "text-blue-700"
+                  textColor: "text-blue-700",
                 },
                 {
                   title: "Interviews",
@@ -548,7 +710,7 @@ const ApplierDashboard = () => {
                   icon: FileText,
                   color: "bg-green-500",
                   bgColor: "bg-green-50",
-                  textColor: "text-green-700"
+                  textColor: "text-green-700",
                 },
                 {
                   title: "Profile Views",
@@ -556,7 +718,7 @@ const ApplierDashboard = () => {
                   icon: Eye,
                   color: "bg-purple-500",
                   bgColor: "bg-purple-50",
-                  textColor: "text-purple-700"
+                  textColor: "text-purple-700",
                 },
                 {
                   title: "Saved Jobs",
@@ -564,15 +726,22 @@ const ApplierDashboard = () => {
                   icon: Bookmark,
                   color: "bg-yellow-500",
                   bgColor: "bg-yellow-50",
-                  textColor: "text-yellow-700"
-                }
+                  textColor: "text-yellow-700",
+                },
               ].map((stat, index) => (
-                <div key={index} className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div
+                  key={index}
+                  className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                >
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 ${stat.color} rounded-2xl flex items-center justify-center shadow-lg`}>
+                    <div
+                      className={`w-12 h-12 ${stat.color} rounded-2xl flex items-center justify-center shadow-lg`}
+                    >
                       <stat.icon className="h-6 w-6 text-white" />
                     </div>
-                    <div className={`px-3 py-1 ${stat.bgColor} ${stat.textColor} rounded-full text-xs font-semibold`}>
+                    <div
+                      className={`px-3 py-1 ${stat.bgColor} ${stat.textColor} rounded-full text-xs font-semibold`}
+                    >
                       +5%
                     </div>
                   </div>
@@ -633,7 +802,7 @@ const ApplierDashboard = () => {
                             </span>
                           </div>
                         )}
-                        
+
                         <div className="flex justify-between items-start mb-6">
                           <div className="flex-1 pr-8">
                             <div className="flex items-center justify-between mb-3">
@@ -643,7 +812,9 @@ const ApplierDashboard = () => {
                               <div className="flex items-center space-x-3">
                                 <div className="flex items-center px-3 py-1 bg-white rounded-xl border border-gray-200">
                                   <Target className="h-3 w-3 text-green-500 mr-1" />
-                                  <span className="text-xs font-semibold text-gray-700">{job.matchScore}% match</span>
+                                  <span className="text-xs font-semibold text-gray-700">
+                                    {job.matchScore}% match
+                                  </span>
                                 </div>
                                 <button
                                   onClick={() => handleSaveJob(job.id)}
@@ -655,7 +826,9 @@ const ApplierDashboard = () => {
                                 >
                                   <Heart
                                     className={`h-4 w-4 ${
-                                      savedJobs.includes(job.id) ? "fill-current" : ""
+                                      savedJobs.includes(job.id)
+                                        ? "fill-current"
+                                        : ""
                                     }`}
                                   />
                                 </button>
@@ -731,7 +904,8 @@ const ApplierDashboard = () => {
                     ))}
                 </div>
 
-                {recommendedJobs.filter((job) => !job.isApplied).length === 0 ? (
+                {recommendedJobs.filter((job) => !job.isApplied).length ===
+                0 ? (
                   <div className="text-center py-16">
                     <div className="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
                       <Target className="h-10 w-10 text-gray-400" />
@@ -805,7 +979,10 @@ const ApplierDashboard = () => {
                               {job.applicationDate && (
                                 <span className="flex items-center bg-white px-3 py-2 rounded-xl border border-gray-200">
                                   <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                                  Applied {new Date(job.applicationDate).toLocaleDateString()}
+                                  Applied{" "}
+                                  {new Date(
+                                    job.applicationDate
+                                  ).toLocaleDateString()}
                                 </span>
                               )}
                             </div>
@@ -872,6 +1049,14 @@ const ApplierDashboard = () => {
           </div>
         </div>
       </main>
+
+      {/* Resume Analysis Modal */}
+      {showResumeAnalysis && user?.profile?.resumeAnalysis && (
+        <ResumeAnalysisModal
+          analysis={user.profile.resumeAnalysis}
+          onClose={() => setShowResumeAnalysis(false)}
+        />
+      )}
     </div>
   );
 };

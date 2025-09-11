@@ -1,6 +1,33 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { authenticateUser } from "@/data/mockLoginCredentials";
 
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correct_answer: string;
+}
+
+export interface ResumeAnalysis {
+  score: number;
+  overall_feedback: string;
+  detailed_feedback: Array<{
+    section: string;
+    feedback: string;
+    suggestions: string[];
+  }>;
+  quiz_questions_with_answers: QuizQuestion[];
+  analyzedAt: string;
+}
+
+export interface QuizResult {
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  timeTaken: number; // in seconds
+  completedAt: string;
+  quizType: "skills" | "resume";
+}
+
 export interface User {
   id: string;
   email: string;
@@ -18,6 +45,8 @@ export interface User {
     experience?: string;
     education?: string;
     resume?: string;
+    resumeAnalysis?: ResumeAnalysis;
+    quizResults?: QuizResult[];
     // Student specific fields
     college?: string;
     course?: string;
@@ -49,15 +78,40 @@ export interface RegistrationData {
   companySize?: string;
 }
 
+// Serializable version for Redux state (without File objects)
+export interface SerializableRegistrationData {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+  location: string;
+  avatarName?: string; // Just store the filename
+  userType: "student" | "company";
+  // Student specific fields
+  college?: string;
+  course?: string;
+  graduationYear?: string;
+  resumeName?: string; // Just store the filename
+  // Company specific fields
+  companyName?: string;
+  designation?: string;
+  companySize?: string;
+}
+
 interface UserState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
   token: string | null;
-  registrationData: Partial<RegistrationData>;
+  registrationData: Partial<SerializableRegistrationData>;
   currentUserType: "student" | "company";
   loginLoading: boolean;
+  resumeAnalysis: {
+    isAnalyzing: boolean;
+    error: string | null;
+  };
 }
 
 const initialState: UserState = {
@@ -69,6 +123,10 @@ const initialState: UserState = {
   registrationData: {},
   currentUserType: "student",
   loginLoading: false,
+  resumeAnalysis: {
+    isAnalyzing: false,
+    error: null,
+  },
 };
 
 // Async action for user login
@@ -94,6 +152,33 @@ export const loginUser = createAsyncThunk(
       return { user: credential.user, token };
     } catch (error: any) {
       return rejectWithValue(error.message || "Login failed");
+    }
+  }
+);
+
+// Async action for resume analysis
+export const analyzeResume = createAsyncThunk(
+  "user/analyzeResume",
+  async (resumeFile: File, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("resume", resumeFile);
+
+      const response = await fetch("/api/analyze-resume", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Resume analysis failed");
+      }
+
+      const analysisResult = await response.json();
+
+      return analysisResult as ResumeAnalysis;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Resume analysis failed");
     }
   }
 );
@@ -167,14 +252,21 @@ const userSlice = createSlice({
       }
     },
 
-    // Update registration data
+    // Update registration data (converts File objects to serializable data)
     updateRegistrationData: (
       state,
       action: PayloadAction<Partial<RegistrationData>>
     ) => {
+      const { avatar, resume, ...otherData } = action.payload;
+      const serializableData: Partial<SerializableRegistrationData> = {
+        ...otherData,
+        ...(avatar && { avatarName: avatar.name }),
+        ...(resume && { resumeName: resume.name }),
+      };
+
       state.registrationData = {
         ...state.registrationData,
-        ...action.payload,
+        ...serializableData,
       };
     },
 
@@ -234,6 +326,38 @@ const userSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+
+    // Set resume analysis
+    setResumeAnalysis: (state, action: PayloadAction<ResumeAnalysis>) => {
+      if (state.user) {
+        // Initialize profile if it doesn't exist
+        if (!state.user.profile) {
+          state.user.profile = {};
+        }
+        state.user.profile.resumeAnalysis = action.payload;
+      }
+    },
+
+    // Clear resume analysis error
+    clearResumeAnalysisError: (state) => {
+      state.resumeAnalysis.error = null;
+    },
+
+    // Save quiz result
+    saveQuizResult: (state, action: PayloadAction<QuizResult>) => {
+      if (state.user) {
+        // Initialize profile if it doesn't exist
+        if (!state.user.profile) {
+          state.user.profile = {};
+        }
+        // Initialize quizResults array if it doesn't exist
+        if (!state.user.profile.quizResults) {
+          state.user.profile.quizResults = [];
+        }
+        // Add the new quiz result
+        state.user.profile.quizResults.push(action.payload);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -283,6 +407,25 @@ const userSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+      })
+      // Analyze resume cases
+      .addCase(analyzeResume.pending, (state) => {
+        state.resumeAnalysis.isAnalyzing = true;
+        state.resumeAnalysis.error = null;
+      })
+      .addCase(analyzeResume.fulfilled, (state, action) => {
+        state.resumeAnalysis.isAnalyzing = false;
+        if (state.user) {
+          // Initialize profile if it doesn't exist
+          if (!state.user.profile) {
+            state.user.profile = {};
+          }
+          state.user.profile.resumeAnalysis = action.payload;
+        }
+      })
+      .addCase(analyzeResume.rejected, (state, action) => {
+        state.resumeAnalysis.isAnalyzing = false;
+        state.resumeAnalysis.error = action.payload as string;
       });
   },
 });
@@ -297,6 +440,9 @@ export const {
   setLoading,
   setError,
   clearError,
+  setResumeAnalysis,
+  clearResumeAnalysisError,
+  saveQuizResult,
 } = userSlice.actions;
 
 // Export the reducer

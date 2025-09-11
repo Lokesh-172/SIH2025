@@ -10,6 +10,7 @@ import {
   clearRegistrationData,
   registerUser,
   clearError,
+  analyzeResume,
   RegistrationData,
 } from "../../slice/user-slice";
 import {
@@ -164,7 +165,7 @@ const SignupForm = () => {
   };
 
   // NEW FUNCTION: Handle resume creation from Resume Builder
-  const handleResumeCreated = (resumeData: any) => {
+  const handleResumeCreated = async (resumeData: any) => {
     // Convert resume data to PDF file
     const resumeContent = generateResumeContent(resumeData);
     const blob = new Blob([resumeContent], { type: "application/pdf" });
@@ -185,10 +186,20 @@ const SignupForm = () => {
     // Close resume builder
     setShowResumeBuilder(false);
 
-    // Show success message
-    alert(
-      `✅ Resume created successfully! "${fileName}" has been added to your profile.`
-    );
+    // Analyze the created resume
+    try {
+      console.log("Analyzing created resume...");
+      await dispatch(analyzeResume(file)).unwrap();
+      console.log("Resume analysis completed successfully!");
+      alert(
+        `✅ Resume created and analyzed successfully! "${fileName}" has been added to your profile. Your ATS score and feedback are now available.`
+      );
+    } catch (error: any) {
+      console.error("Resume analysis failed:", error);
+      alert(
+        `✅ Resume created successfully! "${fileName}" has been added to your profile.\n⚠️ However, analysis failed: ${error}. You can still continue with registration.`
+      );
+    }
   };
 
   // NEW FUNCTION: Generate resume content from resume data
@@ -311,7 +322,7 @@ ${
     `.trim();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type (only PDF)
@@ -345,7 +356,23 @@ ${
       };
 
       setFormData(updatedFormData);
+      // Only update Redux with serializable data, File object will be converted
       dispatch(updateRegistrationData(updatedFormData));
+
+      // Analyze the resume
+      try {
+        console.log("Analyzing resume...");
+        await dispatch(analyzeResume(file)).unwrap();
+        console.log("Resume analysis completed successfully!");
+        alert(
+          "✅ Resume uploaded and analyzed successfully! Your ATS score and feedback are now available."
+        );
+      } catch (error: any) {
+        console.error("Resume analysis failed:", error);
+        alert(
+          `⚠️ Resume uploaded but analysis failed: ${error}. You can still continue with registration.`
+        );
+      }
 
       // Success message
       console.log("Resume uploaded successfully:", file.name);
