@@ -30,7 +30,7 @@ import {
   Camera,
   Plus,
 } from "lucide-react";
-import ResumeBuilder from '../resume/ResumeBuilder'; // Adjust path as needed
+import ResumeBuilder from "../resume/ResumeBuilder"; // Adjust path as needed
 
 // Enhanced GridPattern to match the homepage subtle background
 const GridPattern = () => (
@@ -51,9 +51,14 @@ const GridPattern = () => (
 const SignupForm = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { registrationData, currentUserType, isLoading, error, isAuthenticated, user } = useSelector(
-    (state: RootState) => state.user
-  );
+  const {
+    registrationData,
+    currentUserType,
+    isLoading,
+    error,
+    isAuthenticated,
+    user,
+  } = useSelector((state: RootState) => state.user);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -98,7 +103,7 @@ const SignupForm = () => {
   // Update form data when Redux state changes
   useEffect(() => {
     if (registrationData && Object.keys(registrationData).length > 0) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         ...registrationData,
         userType: currentUserType,
@@ -131,7 +136,7 @@ const SignupForm = () => {
 
       setFormData(clearedFormData);
       setAgreeTerms(false);
-      
+
       // Clear file inputs
       const avatarInput = document.getElementById("avatar") as HTMLInputElement;
       const resumeInput = document.getElementById("resume") as HTMLInputElement;
@@ -151,9 +156,9 @@ const SignupForm = () => {
       ...formData,
       [e.target.name]: e.target.value,
     };
-    
+
     setFormData(updatedFormData);
-    
+
     // Update Redux state
     dispatch(updateRegistrationData(updatedFormData));
   };
@@ -162,78 +167,147 @@ const SignupForm = () => {
   const handleResumeCreated = (resumeData: any) => {
     // Convert resume data to PDF file
     const resumeContent = generateResumeContent(resumeData);
-    const blob = new Blob([resumeContent], { type: 'application/pdf' });
-    const fileName = `${resumeData.personalInfo?.fullName?.replace(/\s+/g, '_') || 'resume'}.pdf`;
-    const file = new File([blob], fileName, { type: 'application/pdf' });
-    
+    const blob = new Blob([resumeContent], { type: "application/pdf" });
+    const fileName = `${
+      resumeData.personalInfo?.fullName?.replace(/\s+/g, "_") || "resume"
+    }.pdf`;
+    const file = new File([blob], fileName, { type: "application/pdf" });
+
     // Update form data with created resume
     const updatedFormData = {
       ...formData,
       resume: file,
     };
-    
+
     setFormData(updatedFormData);
     dispatch(updateRegistrationData(updatedFormData));
-    
+
     // Close resume builder
     setShowResumeBuilder(false);
-    
+
     // Show success message
-    alert(`✅ Resume created successfully! "${fileName}" has been added to your profile.`);
+    alert(
+      `✅ Resume created successfully! "${fileName}" has been added to your profile.`
+    );
   };
 
   // NEW FUNCTION: Generate resume content from resume data
   const generateResumeContent = (resumeData: any) => {
-    const { personalInfo, careerObjective, education, workExperience, skills, projects } = resumeData;
-    
+    const {
+      personalInfo,
+      careerObjective,
+      education,
+      workExperience,
+      skills,
+      projects,
+    } = resumeData;
+
     return `
-RESUME - ${personalInfo?.fullName || 'Your Name'}
+RESUME - ${personalInfo?.fullName || "Your Name"}
 
 CONTACT INFORMATION
-Email: ${personalInfo?.email || ''}
-Phone: ${personalInfo?.phone || ''}
-Address: ${personalInfo?.address || ''}
-${personalInfo?.linkedIn ? `LinkedIn: ${personalInfo.linkedIn}` : ''}
-${personalInfo?.github ? `GitHub: ${personalInfo.github}` : ''}
-${personalInfo?.portfolio ? `Portfolio: ${personalInfo.portfolio}` : ''}
+Email: ${personalInfo?.email || ""}
+Phone: ${personalInfo?.phone || ""}
+Address: ${personalInfo?.address || ""}
+${personalInfo?.linkedIn ? `LinkedIn: ${personalInfo.linkedIn}` : ""}
+${personalInfo?.github ? `GitHub: ${personalInfo.github}` : ""}
+${personalInfo?.portfolio ? `Portfolio: ${personalInfo.portfolio}` : ""}
 
-${careerObjective ? `CAREER OBJECTIVE
+${
+  careerObjective
+    ? `CAREER OBJECTIVE
 ${careerObjective}
 
-` : ''}${education?.length > 0 ? `EDUCATION
-${education.map((edu: any) => `
-${edu.degree} ${edu.specialization ? `in ${edu.specialization}` : ''}
-${edu.institution} ${edu.location ? `- ${edu.location}` : ''}
+`
+    : ""
+}${
+      education?.length > 0
+        ? `EDUCATION
+${education
+  .map(
+    (edu: any) => `
+${edu.degree} ${edu.specialization ? `in ${edu.specialization}` : ""}
+${edu.institution} ${edu.location ? `- ${edu.location}` : ""}
 ${edu.startYear} - ${edu.endYear}
-${edu.cgpa ? `CGPA: ${edu.cgpa}` : ''}${edu.percentage ? ` | Percentage: ${edu.percentage}%` : ''}
-${edu.achievements?.length > 0 ? `Achievements: ${edu.achievements.join('; ')}` : ''}
-`).join('')}
+${edu.cgpa ? `CGPA: ${edu.cgpa}` : ""}${
+      edu.percentage ? ` | Percentage: ${edu.percentage}%` : ""
+    }
+${
+  edu.achievements?.length > 0
+    ? `Achievements: ${edu.achievements.join("; ")}`
+    : ""
+}
+`
+  )
+  .join("")}
 
-` : ''}${workExperience?.length > 0 ? `WORK EXPERIENCE
-${workExperience.map((work: any) => `
+`
+        : ""
+    }${
+      workExperience?.length > 0
+        ? `WORK EXPERIENCE
+${workExperience
+  .map(
+    (work: any) => `
 ${work.position} - ${work.company} (${work.type?.toUpperCase()})
-${work.location || ''} | ${work.startDate} - ${work.isCurrentlyWorking ? 'Present' : work.endDate}
-${work.description?.length > 0 ? `• ${work.description.join('\n• ')}` : ''}
-${work.technologies?.length > 0 ? `Technologies: ${work.technologies.join(', ')}` : ''}
-`).join('')}
+${work.location || ""} | ${work.startDate} - ${
+      work.isCurrentlyWorking ? "Present" : work.endDate
+    }
+${work.description?.length > 0 ? `• ${work.description.join("\n• ")}` : ""}
+${
+  work.technologies?.length > 0
+    ? `Technologies: ${work.technologies.join(", ")}`
+    : ""
+}
+`
+  )
+  .join("")}
 
-` : ''}${skills?.length > 0 ? `SKILLS
-${skills.map((skillGroup: any) => `
-${skillGroup.category} (${skillGroup.proficiencyLevel || 'Intermediate'}):
-${skillGroup.skills?.join(', ') || ''}
-`).join('')}
+`
+        : ""
+    }${
+      skills?.length > 0
+        ? `SKILLS
+${skills
+  .map(
+    (skillGroup: any) => `
+${skillGroup.category} (${skillGroup.proficiencyLevel || "Intermediate"}):
+${skillGroup.skills?.join(", ") || ""}
+`
+  )
+  .join("")}
 
-` : ''}${projects?.length > 0 ? `PROJECTS
-${projects.map((project: any) => `
-${project.title} (${project.type?.charAt(0)?.toUpperCase() + project.type?.slice(1)} Project)
+`
+        : ""
+    }${
+      projects?.length > 0
+        ? `PROJECTS
+${projects
+  .map(
+    (project: any) => `
+${project.title} (${
+      project.type?.charAt(0)?.toUpperCase() + project.type?.slice(1)
+    } Project)
 ${project.description}
-${project.technologies?.length > 0 ? `Technologies: ${project.technologies.join(', ')}` : ''}
-${project.githubLink ? `GitHub: ${project.githubLink}` : ''}
-${project.liveLink ? `Live Demo: ${project.liveLink}` : ''}
-${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.join('; ')}` : ''}
-`).join('')}
+${
+  project.technologies?.length > 0
+    ? `Technologies: ${project.technologies.join(", ")}`
+    : ""
+}
+${project.githubLink ? `GitHub: ${project.githubLink}` : ""}
+${project.liveLink ? `Live Demo: ${project.liveLink}` : ""}
+${
+  project.achievements?.length > 0
+    ? `Key Achievements: ${project.achievements.join("; ")}`
+    : ""
+}
+`
+  )
+  .join("")}
 
-` : ''}Generated via InternMatch Resume Builder
+`
+        : ""
+    }Generated via DISHA Resume Builder
     `.trim();
   };
 
@@ -269,7 +343,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
         ...formData,
         resume: file,
       };
-      
+
       setFormData(updatedFormData);
       dispatch(updateRegistrationData(updatedFormData));
 
@@ -283,10 +357,10 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
       ...formData,
       resume: null,
     };
-    
+
     setFormData(updatedFormData);
     dispatch(updateRegistrationData(updatedFormData));
-    
+
     // Clear the file input
     const fileInput = document.getElementById("resume") as HTMLInputElement;
     if (fileInput) {
@@ -316,7 +390,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
         ...formData,
         avatar: file,
       };
-      
+
       setFormData(updatedFormData);
       dispatch(updateRegistrationData(updatedFormData));
     }
@@ -327,10 +401,10 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
       ...formData,
       avatar: null,
     };
-    
+
     setFormData(updatedFormData);
     dispatch(updateRegistrationData(updatedFormData));
-    
+
     // Clear the file input
     const avatarInput = document.getElementById("avatar") as HTMLInputElement;
     if (avatarInput) {
@@ -364,18 +438,18 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
     try {
       // Dispatch the registration action
       await dispatch(registerUser(formData)).unwrap();
-      
+
       // Success message
       alert(
-        `Registration successful! Welcome to InternMatch!${
+        `Registration successful! Welcome to DISHA!${
           formData.resume ? " Your resume has been uploaded successfully." : ""
         }${formData.avatar ? " Your profile picture has been uploaded." : ""}`
       );
-      
+
       // Clear form data after successful registration
       dispatch(clearRegistrationData());
       setAgreeTerms(false);
-      
+
       // Navigation is handled by useEffect after successful registration
     } catch (error: any) {
       // Error is handled by Redux state
@@ -384,7 +458,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-center items-center bg-gray-50 py-12">
+    <div className="relative min-h-screen flex flex-col justify-center items-center bg-white py-12">
       <div className="absolute inset-0">
         <GridPattern />
       </div>
@@ -392,11 +466,11 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
       {/* Header with logo */}
       <div className="absolute top-0 left-0 right-0 p-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="text-2xl font-bold text-gray-800">InternMatch</div>
+          <div className="text-2xl font-bold text-gray-800">DISHA</div>
           <div className="text-sm text-gray-600">
             Already have an account?{" "}
-            <button 
-              onClick={() => router.push('/login')}
+            <button
+              onClick={() => router.push("/login")}
               className="text-gray-800 hover:text-gray-600 font-medium"
             >
               Sign In
@@ -410,7 +484,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
         <div className="max-w-lg mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              Join InternMatch
+              Join DISHA
             </h1>
             <p className="text-lg text-gray-600 leading-relaxed">
               Create your account and start your journey to the perfect
@@ -426,7 +500,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                 onClick={() => handleUserTypeChange("student")}
                 className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   currentUserType === "student"
-                    ? "bg-orange-200 text-gray-800 shadow-md transform scale-105"
+                    ? "bg-gray-900 text-white shadow-md transform scale-105"
                     : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                 }`}
               >
@@ -437,7 +511,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                 onClick={() => handleUserTypeChange("company")}
                 className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   currentUserType === "company"
-                    ? "bg-gray-700 text-white shadow-md transform scale-105"
+                    ? "bg-blue-600 text-white shadow-md transform scale-105"
                     : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                 }`}
               >
@@ -454,7 +528,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                 <p className="text-red-600 text-sm font-medium">{error}</p>
               </div>
             )}
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Avatar Upload Section */}
               <div className="flex flex-col items-center mb-8">
@@ -497,10 +571,10 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                     // Show upload placeholder
                     <label
                       htmlFor="avatar"
-                      className="w-24 h-24 rounded-full bg-gray-100 border-4 border-dashed border-gray-300 hover:border-orange-300 hover:bg-orange-50 flex items-center justify-center cursor-pointer transition-all duration-200 group"
+                      className="w-24 h-24 rounded-full bg-gray-100 border-4 border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-100 flex items-center justify-center cursor-pointer transition-all duration-200 group"
                     >
                       <div className="text-center">
-                        <Plus className="h-8 w-8 text-gray-400 group-hover:text-orange-500 transition-colors mx-auto" />
+                        <Plus className="h-8 w-8 text-gray-400 group-hover:text-gray-600 transition-colors mx-auto" />
                       </div>
                     </label>
                   )}
@@ -541,7 +615,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       placeholder={
                         currentUserType === "student"
                           ? "Enter your full name"
@@ -564,7 +638,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       placeholder="Enter your email address"
                       required
                     />
@@ -583,7 +657,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       placeholder="Enter your phone number"
                       required
                     />
@@ -602,7 +676,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="location"
                       value={formData.location}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       placeholder="Enter your city/state"
                       required
                     />
@@ -631,7 +705,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                         name="college"
                         value={formData.college}
                         onChange={handleInputChange}
-                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                         placeholder="Enter your college/university name"
                         required
                       />
@@ -647,7 +721,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="course"
                       value={formData.course}
                       onChange={handleInputChange}
-                      className="w-full pl-4 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-4 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       required
                     >
                       <option value="">Select your course</option>
@@ -676,7 +750,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="graduationYear"
                       value={formData.graduationYear}
                       onChange={handleInputChange}
-                      className="w-full pl-4 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-4 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       required
                     >
                       <option value="">Select graduation year</option>
@@ -714,14 +788,17 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                                 {formData.resume.name}
                               </p>
                               <p className="text-xs text-gray-600">
-                                {(formData.resume.size / (1024 * 1024)).toFixed(2)} MB
+                                {(formData.resume.size / (1024 * 1024)).toFixed(
+                                  2
+                                )}{" "}
+                                MB
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
                             <label
                               htmlFor="resume"
-                              className="px-3 py-1.5 text-xs font-medium text-orange-600 bg-orange-100 rounded-lg hover:bg-orange-200 cursor-pointer transition-colors"
+                              className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors"
                             >
                               Change
                             </label>
@@ -741,10 +818,10 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                           {/* Upload existing resume option */}
                           <label
                             htmlFor="resume"
-                            className="w-full flex items-center justify-center px-4 py-6 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 cursor-pointer group"
+                            className="w-full flex items-center justify-center px-4 py-6 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 cursor-pointer group"
                           >
                             <div className="text-center">
-                              <Upload className="mx-auto h-8 w-8 text-gray-400 group-hover:text-orange-500 mb-2 transition-colors" />
+                              <Upload className="mx-auto h-8 w-8 text-gray-400 group-hover:text-gray-600 mb-2 transition-colors" />
                               <p className="text-sm font-medium text-gray-700 mb-1">
                                 Upload your resume
                               </p>
@@ -760,7 +837,9 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                               <div className="w-full border-t border-gray-200" />
                             </div>
                             <div className="relative flex justify-center text-sm">
-                              <span className="px-4 bg-white text-gray-500">or</span>
+                              <span className="px-4 bg-white text-gray-500">
+                                or
+                              </span>
                             </div>
                           </div>
 
@@ -768,14 +847,14 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                           <button
                             type="button"
                             onClick={() => setShowResumeBuilder(true)}
-                            className="w-full flex items-center justify-center px-4 py-6 bg-gradient-to-r from-orange-100 to-orange-200 border-2 border-orange-200 rounded-xl hover:from-orange-200 hover:to-orange-300 transition-all duration-200 group"
+                            className="w-full flex items-center justify-center px-4 py-6 bg-gray-50 border-2 border-gray-200 rounded-xl hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 group"
                           >
                             <div className="text-center">
-                              <Plus className="mx-auto h-8 w-8 text-orange-600 group-hover:text-orange-700 mb-2 transition-colors" />
-                              <p className="text-sm font-medium text-orange-800 mb-1">
+                              <Plus className="mx-auto h-8 w-8 text-gray-600 group-hover:text-gray-700 mb-2 transition-colors" />
+                              <p className="text-sm font-medium text-gray-800 mb-1">
                                 Create Resume Now
                               </p>
-                              <p className="text-xs text-orange-600">
+                              <p className="text-xs text-gray-600">
                                 Build a professional resume in minutes
                               </p>
                             </div>
@@ -812,7 +891,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                         name="companyName"
                         value={formData.companyName}
                         onChange={handleInputChange}
-                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                         placeholder="Enter your company name"
                         required
                       />
@@ -829,7 +908,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="designation"
                       value={formData.designation}
                       onChange={handleInputChange}
-                      className="w-full pl-4 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-4 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       placeholder="Enter your job title/designation"
                       required
                     />
@@ -844,7 +923,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="companySize"
                       value={formData.companySize}
                       onChange={handleInputChange}
-                      className="w-full pl-4 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-4 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       required
                     >
                       <option value="">Select company size</option>
@@ -879,7 +958,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-12 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       placeholder="Create a strong password"
                       required
                     />
@@ -909,13 +988,15 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                      className="w-full pl-12 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                       placeholder="Confirm your password"
                       required
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       {showConfirmPassword ? (
@@ -935,21 +1016,21 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                   id="agreeTerms"
                   checked={agreeTerms}
                   onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="mt-1 h-5 w-5 text-orange-200 border-gray-300 rounded focus:ring-orange-200"
+                  className="mt-1 h-5 w-5 text-gray-200 border-gray-300 rounded focus:ring-gray-200"
                   required
                 />
                 <label htmlFor="agreeTerms" className="text-sm text-gray-700">
                   I agree to the{" "}
                   <button
                     type="button"
-                    className="text-gray-800 font-semibold hover:text-gray-600 transition-colors"
+                    className="text-gray-900 font-semibold hover:text-gray-700 transition-colors"
                   >
                     Terms & Conditions
                   </button>{" "}
                   and{" "}
                   <button
                     type="button"
-                    className="text-gray-800 font-semibold hover:text-gray-600 transition-colors"
+                    className="text-gray-900 font-semibold hover:text-gray-700 transition-colors"
                   >
                     Privacy Policy
                   </button>
@@ -960,10 +1041,10 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex items-center justify-center px-6 py-4 rounded-xl text-lg font-semibold shadow-lg transition-all duration-200 hover:transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full flex items-center justify-center px-6 py-4 rounded-lg text-lg font-semibold shadow-lg transition-colors hover:transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
                   currentUserType === "student"
-                    ? "text-gray-800 bg-orange-200 hover:bg-orange-300 shadow-orange-200/50"
-                    : "text-white bg-gray-700 hover:bg-gray-800 shadow-gray-400/30"
+                    ? "bg-gray-900 text-white hover:bg-gray-800"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
               >
                 {isLoading ? "Creating Account..." : "Create Your Account"}
@@ -975,9 +1056,9 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
             <div className="mt-8 text-center border-t border-gray-100 pt-6">
               <p className="text-gray-600">
                 Already have an account?{" "}
-                <button 
-                  onClick={() => router.push('/login')}
-                  className="text-gray-800 font-semibold hover:text-gray-600 transition-colors"
+                <button
+                  onClick={() => router.push("/login")}
+                  className="text-gray-900 font-semibold hover:text-gray-700 transition-colors"
                 >
                   Sign in here
                 </button>
@@ -988,7 +1069,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
           {/* Benefits */}
           <div className="mt-8 grid grid-cols-2 gap-4">
             <div className="flex items-center bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-gray-100">
-              <CheckCircle className="h-6 w-6 text-orange-400 mr-3 flex-shrink-0" />
+              <CheckCircle className="h-6 w-6 text-gray-400 mr-3 flex-shrink-0" />
               <div>
                 <span className="text-gray-800 font-medium text-sm">
                   Free to Join
@@ -997,7 +1078,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
               </div>
             </div>
             <div className="flex items-center bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-gray-100">
-              <CheckCircle className="h-6 w-6 text-orange-400 mr-3 flex-shrink-0" />
+              <CheckCircle className="h-6 w-6 text-gray-400 mr-3 flex-shrink-0" />
               <div>
                 <span className="text-gray-800 font-medium text-sm">
                   Instant Matching
@@ -1008,7 +1089,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
               </div>
             </div>
             <div className="flex items-center bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-gray-100">
-              <CheckCircle className="h-6 w-6 text-orange-400 mr-3 flex-shrink-0" />
+              <CheckCircle className="h-6 w-6 text-gray-400 mr-3 flex-shrink-0" />
               <div>
                 <span className="text-gray-800 font-medium text-sm">
                   Secure Platform
@@ -1019,7 +1100,7 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
               </div>
             </div>
             <div className="flex items-center bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-gray-100">
-              <CheckCircle className="h-6 w-6 text-orange-400 mr-3 flex-shrink-0" />
+              <CheckCircle className="h-6 w-6 text-gray-400 mr-3 flex-shrink-0" />
               <div>
                 <span className="text-gray-800 font-medium text-sm">
                   24/7 Support
@@ -1038,7 +1119,9 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">Create Your Resume</h2>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Create Your Resume
+              </h2>
               <button
                 onClick={() => setShowResumeBuilder(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -1046,8 +1129,11 @@ ${project.achievements?.length > 0 ? `Key Achievements: ${project.achievements.j
                 <X className="h-6 w-6 text-gray-500" />
               </button>
             </div>
-            <div className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 80px)' }}>
-              <ResumeBuilder 
+            <div
+              className="overflow-y-auto"
+              style={{ maxHeight: "calc(90vh - 80px)" }}
+            >
+              <ResumeBuilder
                 onResumeComplete={handleResumeCreated}
                 onCancel={() => setShowResumeBuilder(false)}
                 isModal={true}

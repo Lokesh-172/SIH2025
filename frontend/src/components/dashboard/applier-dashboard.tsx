@@ -254,7 +254,7 @@ const ApplierDashboard = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    InternMatch
+                    DISHA
                   </h1>
                   <span className="text-sm text-gray-600 font-medium">
                     Student Portal

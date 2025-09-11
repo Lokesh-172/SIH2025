@@ -278,7 +278,7 @@ const CompanyDashboard = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    InternMatch
+                    DISHA
                   </h1>
                   <span className="text-sm text-gray-600 font-medium">
                     Company Portal
@@ -653,7 +653,7 @@ const CompanyDashboard = () => {
                         </p>
 
                         <div className="flex flex-wrap gap-2 mb-6">
-                          {job.skills.map((skill, index) => (
+                          {job.skills.map((skill : string, index : number) => (
                             <span
                               key={index}
                               className="px-3 py-2 bg-white text-gray-700 text-sm font-medium rounded-xl border border-gray-200"

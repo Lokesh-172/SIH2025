@@ -204,11 +204,11 @@ export const mockLoginCredentials: LoginCredential[] = [
 
   // Admin account
   {
-    email: "admin@internmatch.com",
+    email: "admin@DISHA.com",
     password: "admin123",
     user: {
       id: "999",
-      email: "admin@internmatch.com",
+      email: "admin@DISHA.com",
       name: "Admin User",
       avatar: "/img7.jpg",
       role: "admin",
@@ -219,7 +219,7 @@ export const mockLoginCredentials: LoginCredential[] = [
         phone: "+1-555-9999",
         location: "San Francisco, CA",
         bio: "Platform administrator with full access to manage users, companies, and system settings.",
-        companyName: "InternMatch",
+        companyName: "DISHA",
         designation: "System Administrator",
         companySize: "10-50",
       },
@@ -259,7 +259,7 @@ export const demoCredentials = {
     password: "company123",
   },
   admin: {
-    email: "admin@internmatch.com",
+    email: "admin@DISHA.com",
     password: "admin123",
   },
 };

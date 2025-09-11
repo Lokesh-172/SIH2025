@@ -112,7 +112,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-center items-center pt-20 bg-gray-50">
+    <div className="relative min-h-screen flex flex-col justify-center items-center pt-20 bg-white">
       <div className="absolute inset-0">
         <GridPattern />
       </div>
@@ -120,7 +120,7 @@ const LoginForm = () => {
       {/* Header with logo */}
       <div className="absolute top-0 left-0 right-0 p-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="text-2xl font-bold text-gray-800">InternMatch</div>
+          <div className="text-2xl font-bold text-gray-800">DISHA</div>
           <div className="text-sm text-gray-600">
             Back to{" "}
             <button className="text-gray-800 hover:text-gray-600 font-medium">
@@ -180,7 +180,7 @@ const LoginForm = () => {
                       className="w-full text-left px-3 py-2 text-sm bg-white border border-blue-200 rounded hover:bg-blue-50 transition-colors"
                     >
                       <span className="font-medium">Admin:</span>{" "}
-                      admin@internmatch.com
+                      admin@DISHA.com
                     </button>
                   </div>
                 </div>
@@ -195,7 +195,7 @@ const LoginForm = () => {
                 onClick={() => setUserType("student")}
                 className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   userType === "student"
-                    ? "bg-orange-200 text-gray-800 shadow-md transform scale-105"
+                    ? "bg-gray-900 text-white shadow-md transform scale-105"
                     : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                 }`}
               >
@@ -205,7 +205,7 @@ const LoginForm = () => {
                 onClick={() => setUserType("company")}
                 className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   userType === "company"
-                    ? "bg-gray-700 text-white shadow-md transform scale-105"
+                    ? "bg-blue-600 text-white shadow-md transform scale-105"
                     : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                 }`}
               >
@@ -238,7 +238,7 @@ const LoginForm = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                     placeholder="Enter your email address"
                     required
                   />
@@ -257,7 +257,7 @@ const LoginForm = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="w-full pl-12 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-300 outline-none transition-all text-gray-800"
+                    className="w-full pl-12 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-gray-800"
                     placeholder="Enter your password"
                     required
                   />
@@ -289,10 +289,10 @@ const LoginForm = () => {
               <button
                 type="submit"
                 disabled={loginLoading || !formData.email || !formData.password}
-                className={`w-full flex items-center justify-center px-6 py-4 rounded-xl text-lg font-semibold shadow-lg transition-all duration-200 hover:transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
+                className={`w-full flex items-center justify-center px-6 py-4 rounded-lg text-lg font-semibold shadow-lg transition-colors hover:transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
                   userType === "student"
-                    ? "text-gray-800 bg-orange-200 hover:bg-orange-300 shadow-orange-200/50"
-                    : "text-white bg-gray-700 hover:bg-gray-800 shadow-gray-400/30"
+                    ? "bg-gray-900 text-white hover:bg-gray-800"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
               >
                 {loginLoading ? (
@@ -315,9 +315,9 @@ const LoginForm = () => {
             <div className="mt-8 text-center border-t border-gray-100 pt-6">
               <p className="text-gray-600">
                 Don't have an account yet?{" "}
-                <button 
-                  onClick={() => router.push('/sign-up')}
-                  className="text-gray-800 font-semibold hover:text-gray-600 transition-colors"
+                <button
+                  onClick={() => router.push("/sign-up")}
+                  className="text-gray-900 font-semibold hover:text-gray-700 transition-colors"
                 >
                   Create your account
                 </button>
@@ -328,7 +328,7 @@ const LoginForm = () => {
           {/* Benefits - Enhanced to match homepage features */}
           <div className="mt-8 space-y-4">
             <div className="flex items-center justify-center bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-gray-100">
-              <CheckCircle className="h-6 w-6 text-orange-400 mr-4 flex-shrink-0" />
+              <CheckCircle className="h-6 w-6 text-gray-400 mr-4 flex-shrink-0" />
               <div>
                 <span className="text-gray-800 font-medium text-sm">
                   Smart AI Matching
@@ -339,7 +339,7 @@ const LoginForm = () => {
               </div>
             </div>
             <div className="flex items-center justify-center bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-gray-100">
-              <CheckCircle className="h-6 w-6 text-orange-400 mr-4 flex-shrink-0" />
+              <CheckCircle className="h-6 w-6 text-gray-400 mr-4 flex-shrink-0" />
               <div>
                 <span className="text-gray-800 font-medium text-sm">
                   Secure & Private
