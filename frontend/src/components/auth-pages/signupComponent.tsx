@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 import { RootState, AppDispatch } from "../../lib/store";
 import {
   setUserType,
@@ -31,9 +32,8 @@ import {
   Camera,
   Plus,
 } from "lucide-react";
-import ResumeBuilder from "../resume/ResumeBuilder"; // Adjust path as needed
+import ResumeBuilder from "../resume/ResumeBuilder";
 
-// Enhanced GridPattern to match the homepage subtle background
 const GridPattern = () => (
   <div className="absolute inset-0 opacity-10">
     <div
@@ -59,6 +59,7 @@ const SignupForm = () => {
     error,
     isAuthenticated,
     user,
+    resumeAnalysis,
   } = useSelector((state: RootState) => state.user);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -189,15 +190,26 @@ const SignupForm = () => {
     // Analyze the created resume
     try {
       console.log("Analyzing created resume...");
+      toast.loading("Analyzing your resume...", { id: "resume-analysis" });
       await dispatch(analyzeResume(file)).unwrap();
       console.log("Resume analysis completed successfully!");
-      alert(
-        `✅ Resume created and analyzed successfully! "${fileName}" has been added to your profile. Your ATS score and feedback are now available.`
+      toast.success(
+        `Resume created and analyzed successfully! "${fileName}" has been added to your profile.`,
+        {
+          id: "resume-analysis",
+          duration: 4000,
+          icon: "✅",
+        }
       );
     } catch (error: any) {
       console.error("Resume analysis failed:", error);
-      alert(
-        `✅ Resume created successfully! "${fileName}" has been added to your profile.\n⚠️ However, analysis failed: ${error}. You can still continue with registration.`
+      toast.error(
+        `Resume created successfully! However, analysis failed: ${error}`,
+        {
+          id: "resume-analysis",
+          duration: 5000,
+          icon: "⚠️",
+        }
       );
     }
   };
@@ -327,24 +339,27 @@ ${
     if (file) {
       // Validate file type (only PDF)
       if (file.type !== "application/pdf") {
-        alert(
-          "Please upload a PDF file only. Other formats are not supported."
+        toast.error(
+          "Please upload a PDF file only. Other formats are not supported.",
+          { icon: "📄" }
         );
         e.target.value = ""; // Clear the input
         return;
       }
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert(
-          "File size should be less than 5MB. Please compress your PDF or choose a smaller file."
+        toast.error(
+          "File size should be less than 5MB. Please compress your PDF or choose a smaller file.",
+          { icon: "⚖️" }
         );
         e.target.value = ""; // Clear the input
         return;
       }
       // Validate file name length
       if (file.name.length > 100) {
-        alert(
-          "File name is too long. Please rename your file to be under 100 characters."
+        toast.error(
+          "File name is too long. Please rename your file to be under 100 characters.",
+          { icon: "📝" }
         );
         e.target.value = ""; // Clear the input
         return;
@@ -362,15 +377,26 @@ ${
       // Analyze the resume
       try {
         console.log("Analyzing resume...");
+        toast.loading("Analyzing your resume...", { id: "resume-analysis" });
         await dispatch(analyzeResume(file)).unwrap();
         console.log("Resume analysis completed successfully!");
-        alert(
-          "✅ Resume uploaded and analyzed successfully! Your ATS score and feedback are now available."
+        toast.success(
+          "Resume uploaded and analyzed successfully! Your ATS score and feedback are now available.",
+          {
+            id: "resume-analysis",
+            duration: 4000,
+            icon: "✅",
+          }
         );
       } catch (error: any) {
         console.error("Resume analysis failed:", error);
-        alert(
-          `⚠️ Resume uploaded but analysis failed: ${error}. You can still continue with registration.`
+        toast.error(
+          `Resume uploaded but analysis failed: ${error}. You can still continue with registration.`,
+          {
+            id: "resume-analysis",
+            duration: 5000,
+            icon: "⚠️",
+          }
         );
       }
 
@@ -400,14 +426,17 @@ ${
     if (file) {
       // Validate file type (only images)
       if (!file.type.startsWith("image/")) {
-        alert("Please upload an image file only (JPG, PNG, GIF, etc.)");
+        toast.error("Please upload an image file only (JPG, PNG, GIF, etc.)", {
+          icon: "🖼️",
+        });
         e.target.value = "";
         return;
       }
       // Validate file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        alert(
-          "Image size should be less than 2MB. Please choose a smaller file."
+        toast.error(
+          "Image size should be less than 2MB. Please choose a smaller file.",
+          { icon: "📸" }
         );
         e.target.value = "";
         return;
@@ -443,22 +472,53 @@ ${
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match!", {
+        icon: "🔒",
+      });
       return;
     }
 
     if (!agreeTerms) {
-      alert("Please agree to the terms and conditions");
+      toast.error("Please agree to the terms and conditions", {
+        icon: "📋",
+      });
       return;
     }
 
-    // For students, check if resume is uploaded (optional but recommended)
-    if (currentUserType === "student" && !formData.resume) {
-      const shouldContinue = window.confirm(
-        "No resume uploaded. While not required, uploading a resume helps employers learn about your skills. Continue without resume?"
-      );
-      if (!shouldContinue) {
+    // For students, check resume analysis status
+    if (currentUserType === "student") {
+      // If resume is uploaded but analysis is still in progress
+      if (formData.resume && resumeAnalysis.isAnalyzing) {
+        toast.error(
+          "Please wait for your resume analysis to complete before signing up. This ensures your profile is fully optimized!",
+          {
+            icon: "⏳",
+            duration: 4000,
+          }
+        );
         return;
+      }
+
+      // If no resume is uploaded, show informative message
+      if (!formData.resume) {
+        toast(
+          "📄 Continuing without resume. You can upload it later from your dashboard for personalized recommendations!",
+          {
+            icon: "ℹ️",
+            duration: 4000,
+          }
+        );
+      }
+
+      // If resume analysis failed, show warning message
+      if (formData.resume && resumeAnalysis.error) {
+        toast.error(
+          `Resume analysis failed: ${resumeAnalysis.error}. Continuing with registration - you can re-upload your resume later for personalized recommendations.`,
+          {
+            icon: "⚠️",
+            duration: 5000,
+          }
+        );
       }
     }
 
@@ -467,10 +527,14 @@ ${
       await dispatch(registerUser(formData)).unwrap();
 
       // Success message
-      alert(
+      toast.success(
         `Registration successful! Welcome to DISHA!${
           formData.resume ? " Your resume has been uploaded successfully." : ""
-        }${formData.avatar ? " Your profile picture has been uploaded." : ""}`
+        }${formData.avatar ? " Your profile picture has been uploaded." : ""}`,
+        {
+          icon: "🎉",
+          duration: 4000,
+        }
       );
 
       // Clear form data after successful registration
@@ -893,6 +957,35 @@ ${
                       Upload your latest resume in PDF format. This will help
                       employers learn more about your skills and experience.
                     </p>
+
+                    {/* Resume Analysis Status Indicator */}
+                    {formData.resume && (
+                      <div className="mt-3">
+                        {resumeAnalysis.isAnalyzing ? (
+                          <div className="flex items-center px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-3"></div>
+                            <span className="text-sm text-blue-700 font-medium">
+                              Analyzing your resume for ATS optimization...
+                            </span>
+                          </div>
+                        ) : resumeAnalysis.error ? (
+                          <div className="flex items-center px-3 py-2 bg-red-50 border border-red-200 rounded-lg">
+                            <X className="h-4 w-4 text-red-600 mr-3" />
+                            <span className="text-sm text-red-700 font-medium">
+                              Analysis failed: {resumeAnalysis.error}
+                            </span>
+                          </div>
+                        ) : user?.profile?.resumeAnalysis ? (
+                          <div className="flex items-center px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
+                            <CheckCircle className="h-4 w-4 text-green-600 mr-3" />
+                            <span className="text-sm text-green-700 font-medium">
+                              Analysis complete! ATS Score:{" "}
+                              {user.profile.resumeAnalysis.score}/100
+                            </span>
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1064,18 +1157,54 @@ ${
                 </label>
               </div>
 
+              {/* Resume Analysis Notice */}
+              {currentUserType === "student" &&
+                formData.resume &&
+                resumeAnalysis.isAnalyzing && (
+                  <div className="flex items-center px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-600 mr-3"></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-amber-800">
+                        Please wait while we analyze your resume
+                      </p>
+                      <p className="text-xs text-amber-700 mt-1">
+                        This helps us create the best profile for you and
+                        provide personalized recommendations.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
               {/* Register Button */}
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={
+                  isLoading ||
+                  (currentUserType === "student" &&
+                    !!formData.resume &&
+                    resumeAnalysis.isAnalyzing)
+                }
                 className={`w-full flex items-center justify-center px-6 py-4 rounded-lg text-lg font-semibold shadow-lg transition-colors hover:transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
                   currentUserType === "student"
                     ? "bg-gray-900 text-white hover:bg-gray-800"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-purple-500 text-white hover:bg-purple-600"
                 }`}
               >
-                {isLoading ? "Creating Account..." : "Create Your Account"}
-                <ArrowRight className="ml-3 h-5 w-5" />
+                {isLoading ? (
+                  "Creating Account..."
+                ) : currentUserType === "student" &&
+                  formData.resume &&
+                  resumeAnalysis.isAnalyzing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current mr-3"></div>
+                    Analyzing Resume...
+                  </>
+                ) : (
+                  <>
+                    Create Your Account
+                    <ArrowRight className="ml-3 h-5 w-5" />
+                  </>
+                )}
               </button>
             </form>
 

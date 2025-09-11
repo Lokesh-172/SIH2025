@@ -4,6 +4,7 @@ import "./globals.css";
 import { ChatbotProvider } from "@/components/chatbot/context/ChatbotContext";
 import ChatBot from "@/components/chatbot/chatbot";
 import ReduxProvider from "@/components/providers/redux-provider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,27 @@ export default function RootLayout({
           <ChatbotProvider>
             {children}
             <ChatBot />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: '#1f2937',
+                  color: '#fff',
+                  borderRadius: '8px',
+                },
+                success: {
+                  style: {
+                    background: '#10b981',
+                  },
+                },
+                error: {
+                  style: {
+                    background: '#ef4444',
+                  },
+                },
+              }}
+            />
           </ChatbotProvider>
         </ReduxProvider>
       </body>
