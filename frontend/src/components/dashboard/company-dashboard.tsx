@@ -41,8 +41,8 @@ import {
 } from "lucide-react";
 
 // Import the components
-import JobCreationForm from './dashboardComponents/jobCreate';
-import ApplicationsList from './dashboardComponents/ApplicationList';
+import JobCreationForm from "./dashboardComponents/jobCreate";
+import ApplicationsList from "./dashboardComponents/ApplicationList";
 
 const CompanyDashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -55,7 +55,8 @@ const CompanyDashboard = () => {
   // Add modal states
   const [showJobModal, setShowJobModal] = useState(false);
   const [showApplicationsModal, setShowApplicationsModal] = useState(false);
-  const [selectedJobForApplications, setSelectedJobForApplications] = useState<any>(null);
+  const [selectedJobForApplications, setSelectedJobForApplications] =
+    useState<any>(null);
   const [createdJobs, setCreatedJobs] = useState<any[]>([]);
 
   // Mock job data
@@ -151,9 +152,9 @@ const CompanyDashboard = () => {
   };
 
   const handleJobCreated = (newJob: any) => {
-    setCreatedJobs(prev => [...prev, newJob]);
+    setCreatedJobs((prev) => [...prev, newJob]);
     setShowJobModal(false);
-    alert('Job posted successfully!');
+    alert("Job posted successfully!");
   };
 
   const handleEditJob = (jobId: string) => {
@@ -162,13 +163,13 @@ const CompanyDashboard = () => {
 
   const handleDeleteJob = (jobId: string) => {
     if (confirm("Are you sure you want to delete this job posting?")) {
-      setCreatedJobs(prev => prev.filter(job => job.id !== jobId));
+      setCreatedJobs((prev) => prev.filter((job) => job.id !== jobId));
       alert(`Job ${jobId} deleted successfully!`);
     }
   };
 
   const handleViewApplications = (jobId: string) => {
-    const job = allJobs.find(j => j.id === jobId);
+    const job = allJobs.find((j) => j.id === jobId);
     if (job) {
       setSelectedJobForApplications(job);
       setShowApplicationsModal(true);
@@ -180,7 +181,7 @@ const CompanyDashboard = () => {
       setSelectedJobForApplications(allJobs[0]);
       setShowApplicationsModal(true);
     } else {
-      alert('No jobs found to view applications!');
+      alert("No jobs found to view applications!");
     }
   };
 
@@ -287,7 +288,7 @@ const CompanyDashboard = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <button 
+              <button
                 onClick={handleCreateJobClick}
                 className="flex items-center px-6 py-3 bg-gray-900 text-white rounded-2xl font-medium hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl group"
               >
@@ -380,7 +381,9 @@ const CompanyDashboard = () => {
                     <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
                       <Users className="h-4 w-4 text-gray-600" />
                     </div>
-                    <span className="font-medium">{user.profile.companySize} employees</span>
+                    <span className="font-medium">
+                      {user.profile.companySize} employees
+                    </span>
                   </div>
                 )}
               </div>
@@ -410,7 +413,7 @@ const CompanyDashboard = () => {
                 Quick Actions
               </h3>
               <div className="space-y-3">
-                <button 
+                <button
                   onClick={handleCreateJobClick}
                   className="w-full flex items-center justify-between px-4 py-4 bg-gray-900 text-white rounded-2xl font-medium hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl group"
                 >
@@ -420,7 +423,7 @@ const CompanyDashboard = () => {
                   </div>
                   <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button 
+                <button
                   onClick={handleViewAllApplications}
                   className="w-full flex items-center justify-between px-4 py-4 bg-gray-100 text-gray-700 rounded-2xl font-medium hover:bg-gray-200 transition-all duration-200 group"
                 >
@@ -471,19 +474,23 @@ const CompanyDashboard = () => {
               {[
                 {
                   title: "Active Jobs",
-                  value: allJobs.filter((job) => job.status === "active").length,
+                  value: allJobs.filter((job) => job.status === "active")
+                    .length,
                   icon: Briefcase,
                   color: "bg-blue-500",
                   bgColor: "bg-blue-50",
-                  textColor: "text-blue-700"
+                  textColor: "text-blue-700",
                 },
                 {
                   title: "Total Applications",
-                  value: allJobs.reduce((acc, job) => acc + (job.applicationsCount || 0), 0),
+                  value: allJobs.reduce(
+                    (acc, job) => acc + (job.applicationsCount || 0),
+                    0
+                  ),
                   icon: FileText,
                   color: "bg-green-500",
                   bgColor: "bg-green-50",
-                  textColor: "text-green-700"
+                  textColor: "text-green-700",
                 },
                 {
                   title: "Draft Jobs",
@@ -491,7 +498,7 @@ const CompanyDashboard = () => {
                   icon: Edit2,
                   color: "bg-yellow-500",
                   bgColor: "bg-yellow-50",
-                  textColor: "text-yellow-700"
+                  textColor: "text-yellow-700",
                 },
                 {
                   title: "Hired",
@@ -499,15 +506,22 @@ const CompanyDashboard = () => {
                   icon: Users,
                   color: "bg-purple-500",
                   bgColor: "bg-purple-50",
-                  textColor: "text-purple-700"
-                }
+                  textColor: "text-purple-700",
+                },
               ].map((stat, index) => (
-                <div key={index} className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div
+                  key={index}
+                  className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                >
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 ${stat.color} rounded-2xl flex items-center justify-center shadow-lg`}>
+                    <div
+                      className={`w-12 h-12 ${stat.color} rounded-2xl flex items-center justify-center shadow-lg`}
+                    >
                       <stat.icon className="h-6 w-6 text-white" />
                     </div>
-                    <div className={`px-3 py-1 ${stat.bgColor} ${stat.textColor} rounded-full text-xs font-semibold`}>
+                    <div
+                      className={`px-3 py-1 ${stat.bgColor} ${stat.textColor} rounded-full text-xs font-semibold`}
+                    >
                       +12%
                     </div>
                   </div>
@@ -556,17 +570,20 @@ const CompanyDashboard = () => {
                     {
                       key: "active",
                       label: "Active",
-                      count: allJobs.filter((job) => job.status === "active").length,
+                      count: allJobs.filter((job) => job.status === "active")
+                        .length,
                     },
                     {
                       key: "draft",
                       label: "Draft",
-                      count: allJobs.filter((job) => job.status === "draft").length,
+                      count: allJobs.filter((job) => job.status === "draft")
+                        .length,
                     },
                     {
                       key: "closed",
                       label: "Closed",
-                      count: allJobs.filter((job) => job.status === "closed").length,
+                      count: allJobs.filter((job) => job.status === "closed")
+                        .length,
                     },
                     { key: "all", label: "All", count: allJobs.length },
                   ].map((tab) => (
@@ -642,7 +659,8 @@ const CompanyDashboard = () => {
                               </span>
                               <span className="flex items-center bg-white px-3 py-2 rounded-xl col-span-2">
                                 <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                                Deadline: {new Date(job.deadline).toLocaleDateString()}
+                                Deadline:{" "}
+                                {new Date(job.deadline).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
@@ -653,7 +671,7 @@ const CompanyDashboard = () => {
                         </p>
 
                         <div className="flex flex-wrap gap-2 mb-6">
-                          {job.skills.map((skill, index) => (
+                          {job.skills.map((skill: string, index: number) => (
                             <span
                               key={index}
                               className="px-3 py-2 bg-white text-gray-700 text-sm font-medium rounded-xl border border-gray-200"
@@ -665,7 +683,8 @@ const CompanyDashboard = () => {
 
                         <div className="flex items-center justify-between">
                           <div className="text-sm text-gray-500">
-                            Posted on {new Date(job.postedDate).toLocaleDateString()}
+                            Posted on{" "}
+                            {new Date(job.postedDate).toLocaleDateString()}
                           </div>
                           <div className="flex space-x-3">
                             <button
@@ -707,7 +726,7 @@ const CompanyDashboard = () => {
                         ? "Create your first internship posting to start receiving applications"
                         : `You don't have any ${activeTab} jobs at the moment`}
                     </p>
-                    <button 
+                    <button
                       onClick={handleCreateJobClick}
                       className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-semibold hover:bg-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
@@ -740,28 +759,35 @@ const CompanyDashboard = () => {
                     value: "87%",
                     icon: Target,
                     color: "bg-blue-500",
-                    bgColor: "bg-blue-50"
+                    bgColor: "bg-blue-50",
                   },
                   {
                     title: "Average Company Rating",
                     value: "4.8",
                     icon: Star,
                     color: "bg-green-500",
-                    bgColor: "bg-green-50"
+                    bgColor: "bg-green-50",
                   },
                   {
                     title: "Average Response Time",
                     value: "3.2 days",
                     icon: Clock,
                     color: "bg-purple-500",
-                    bgColor: "bg-purple-50"
-                  }
+                    bgColor: "bg-purple-50",
+                  },
                 ].map((analytic, index) => (
-                  <div key={index} className={`text-center p-6 rounded-3xl ${analytic.bgColor} border border-gray-200/50`}>
-                    <div className={`w-14 h-14 ${analytic.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}>
+                  <div
+                    key={index}
+                    className={`text-center p-6 rounded-3xl ${analytic.bgColor} border border-gray-200/50`}
+                  >
+                    <div
+                      className={`w-14 h-14 ${analytic.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}
+                    >
                       <analytic.icon className="h-7 w-7 text-white" />
                     </div>
-                    <p className="text-3xl font-bold text-gray-900 mb-2">{analytic.value}</p>
+                    <p className="text-3xl font-bold text-gray-900 mb-2">
+                      {analytic.value}
+                    </p>
                     <p className="text-sm font-semibold text-gray-600">
                       {analytic.title}
                     </p>
