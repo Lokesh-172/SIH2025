@@ -40,6 +40,8 @@ Demonstrated Skills & Experience (30% Weight): Evaluate the quality of the candi
 Academic Foundation (20% Weight): Assess the relevance and strength of the candidate's educational background for this specific role.
 Qualitative Assessment (10% Weight): (Only if answers are provided) Evaluate the originality, motivation, and clarity demonstrated in the answers to the three application questions.
 
+Dynamically generate mcq quiz containing 10 questions with 4 options each relevant to the skills in the resume and in the sector, the question set should consist of 3 easy, 5 medium and 2 hard.
+
 Your response MUST be a valid JSON object with the following structure:
 {
   "score": <number>,
@@ -51,6 +53,18 @@ Your response MUST be a valid JSON object with the following structure:
       "suggestions": [
         "<string>"
       ]
+    }
+  ],
+  "quiz_questions_with_answers": [
+    {
+      "question": "<string>",
+      "options": [
+        "<string>",
+        "<string>",
+        "<string>",
+        "<string>"
+      ],
+      "correct_answer": "<string>"
     }
   ]
 }
