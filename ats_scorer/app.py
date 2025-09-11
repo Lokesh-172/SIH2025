@@ -1,5 +1,5 @@
 import os
-import fitz  # PyMuPDF
+import fitz  
 import requests
 import uvicorn
 from fastapi import FastAPI, UploadFile, File, HTTPException, status
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # --- Environment & API Configuration ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY environment variable not set. Please create a .env file and add it.")
+    raise ValueError("GEMINI_API_KEY environment variable not set. Please provide it in the deployment environment.")
 
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={GEMINI_API_KEY}"
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
@@ -40,6 +40,8 @@ Demonstrated Skills & Experience (30% Weight): Evaluate the quality of the candi
 Academic Foundation (20% Weight): Assess the relevance and strength of the candidate's educational background for this specific role.
 Qualitative Assessment (10% Weight): (Only if answers are provided) Evaluate the originality, motivation, and clarity demonstrated in the answers to the three application questions.
 
+Dynamically generate mcq quiz containing 10 questions with 4 options each relevant to the skills in the resume and in the sector, the question set should consist of 3 easy, 5 medium and 2 hard.
+
 Your response MUST be a valid JSON object with the following structure:
 {
   "score": <number>,
@@ -51,6 +53,18 @@ Your response MUST be a valid JSON object with the following structure:
       "suggestions": [
         "<string>"
       ]
+    }
+  ],
+  "quiz_questions_with_answers": [
+    {
+      "question": "<string>",
+      "options": [
+        "<string>",
+        "<string>",
+        "<string>",
+        "<string>"
+      ],
+      "correct_answer": "<string>"
     }
   ]
 }
@@ -137,7 +151,7 @@ async def analyze_resume(resume: UploadFile = File(...)):
 
 # --- Main entry point for running the server ---
 if __name__ == '__main__':
-    # This block allows running the app directly with `python app.py` for development.
-    # Uvicorn is the standard ASGI server for FastAPI.
-    uvicorn.run(app, host="127.0.0.1", port=5001)
+    # This block is for local development. Render will use the Start Command instead.
+    # The host is set to "0.0.0.0" to be accessible within a container.
+    uvicorn.run(app, host="0.0.0.0", port=5001)
 
