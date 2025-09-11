@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const ATS_SCORER_URL = process.env.ATS_SCORER_URL || "http://localhost:5001";
+const ATS_SCORER_URL = process.env.ATS_SCORER_URL;
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +33,8 @@ export async function POST(request: NextRequest) {
     // Create form data for the ATS scorer
     const atsFormData = new FormData();
     atsFormData.append("resume", resume);
+
+    console.log(`Sending resume to ATS scorer at ${ATS_SCORER_URL}/analyze-resume/`);
 
     // Call the ATS scorer service
     const atsResponse = await fetch(`${ATS_SCORER_URL}/analyze-resume/`, {
