@@ -111,6 +111,7 @@ interface UserState {
   resumeAnalysis: {
     isAnalyzing: boolean;
     error: string | null;
+    tempAnalysisData: ResumeAnalysis | null; // Store analysis during signup
   };
 }
 
@@ -126,6 +127,7 @@ const initialState: UserState = {
   resumeAnalysis: {
     isAnalyzing: false,
     error: null,
+    tempAnalysisData: null,
   },
 };
 
@@ -304,6 +306,7 @@ const userSlice = createSlice({
       state.error = null;
       state.registrationData = {};
       state.currentUserType = "student";
+      state.resumeAnalysis.tempAnalysisData = null; // Clear temp analysis data
 
       // Remove token from localStorage
       if (typeof window !== "undefined") {
@@ -341,6 +344,11 @@ const userSlice = createSlice({
     // Clear resume analysis error
     clearResumeAnalysisError: (state) => {
       state.resumeAnalysis.error = null;
+    },
+
+    // Clear temporary resume analysis data
+    clearTempAnalysisData: (state) => {
+      state.resumeAnalysis.tempAnalysisData = null;
     },
 
     // Save quiz result
@@ -399,6 +407,17 @@ const userSlice = createSlice({
         state.currentUserType =
           action.payload.user.role === "student" ? "student" : "company";
 
+        // Transfer temporary resume analysis data to user profile
+        if (state.resumeAnalysis.tempAnalysisData) {
+          if (!state.user.profile) {
+            state.user.profile = {};
+          }
+          state.user.profile.resumeAnalysis =
+            state.resumeAnalysis.tempAnalysisData;
+          // Clear temporary data
+          state.resumeAnalysis.tempAnalysisData = null;
+        }
+
         // Store token in localStorage
         if (typeof window !== "undefined") {
           localStorage.setItem("token", action.payload.token);
@@ -421,6 +440,9 @@ const userSlice = createSlice({
             state.user.profile = {};
           }
           state.user.profile.resumeAnalysis = action.payload;
+        } else {
+          // Store in temporary location during signup
+          state.resumeAnalysis.tempAnalysisData = action.payload;
         }
       })
       .addCase(analyzeResume.rejected, (state, action) => {
@@ -442,6 +464,7 @@ export const {
   clearError,
   setResumeAnalysis,
   clearResumeAnalysisError,
+  clearTempAnalysisData,
   saveQuizResult,
 } = userSlice.actions;
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import { QuizQuestion } from "@/slice/user-slice";
 import Quiz from "./quiz";
 import {
   Brain,
@@ -28,7 +29,7 @@ const ResumeQuiz: React.FC<ResumeQuizProps> = ({ onClose, onComplete }) => {
   const resumeAnalysis = user?.profile?.resumeAnalysis;
 
   // Convert resume analysis questions to Quiz component format
-  const convertToQuizFormat = (questions: any[]) => {
+  const convertToQuizFormat = (questions: QuizQuestion[]) => {
     return questions.map((q, index) => ({
       id: index + 1,
       question: q.question,
@@ -45,7 +46,10 @@ const ResumeQuiz: React.FC<ResumeQuizProps> = ({ onClose, onComplete }) => {
     }));
   };
 
-  if (!resumeAnalysis?.quiz_questions_with_answers) {
+  if (
+    !resumeAnalysis?.quiz_questions_with_answers ||
+    resumeAnalysis.quiz_questions_with_answers.length === 0
+  ) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200/50 p-8 max-w-md w-full text-center">
@@ -56,8 +60,9 @@ const ResumeQuiz: React.FC<ResumeQuizProps> = ({ onClose, onComplete }) => {
             No Quiz Available
           </h2>
           <p className="text-gray-600 mb-6">
-            Please upload and analyze your resume first to generate a
-            personalized skills assessment quiz.
+            {!resumeAnalysis
+              ? "Please upload and analyze your resume first to generate a personalized skills assessment quiz."
+              : "No quiz questions were generated from your resume analysis. Please try uploading your resume again."}
           </p>
           {onClose && (
             <button

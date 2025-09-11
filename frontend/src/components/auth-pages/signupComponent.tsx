@@ -12,6 +12,8 @@ import {
   registerUser,
   clearError,
   analyzeResume,
+  setResumeAnalysis,
+  clearTempAnalysisData,
   RegistrationData,
 } from "../../slice/user-slice";
 import {
@@ -214,6 +216,30 @@ const SignupForm = () => {
     }
   };
 
+  // DEBUG FUNCTION: Check ATS data in Redux state
+  const debugATSData = () => {
+    console.log("=== ATS DATA DEBUG ===");
+    console.log("User object:", user);
+    console.log("Resume Analysis:", user?.profile?.resumeAnalysis);
+    console.log("Resume Analysis State:", resumeAnalysis);
+    console.log("Is Analyzing:", resumeAnalysis.isAnalyzing);
+    console.log("Analysis Error:", resumeAnalysis.error);
+    console.log("Temp Analysis Data:", resumeAnalysis.tempAnalysisData);
+    console.log("=== END DEBUG ===");
+  };
+
+  // Call debug function when user data changes (for testing)
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("User data changed, debugging ATS data...");
+      debugATSData();
+    }
+  }, [
+    user?.profile?.resumeAnalysis,
+    resumeAnalysis.tempAnalysisData,
+    resumeAnalysis.isAnalyzing,
+  ]);
+
   // NEW FUNCTION: Generate resume content from resume data
   const generateResumeContent = (resumeData: any) => {
     const {
@@ -378,16 +404,37 @@ ${
       try {
         console.log("Analyzing resume...");
         toast.loading("Analyzing your resume...", { id: "resume-analysis" });
-        await dispatch(analyzeResume(file)).unwrap();
-        console.log("Resume analysis completed successfully!");
-        toast.success(
-          "Resume uploaded and analyzed successfully! Your ATS score and feedback are now available.",
-          {
-            id: "resume-analysis",
-            duration: 4000,
-            icon: "✅",
-          }
-        );
+        const analysisResult = await dispatch(analyzeResume(file)).unwrap();
+
+        // Validate the analysis result structure
+        if (
+          analysisResult &&
+          typeof analysisResult.score === "number" &&
+          analysisResult.overall_feedback
+        ) {
+          console.log(
+            "Resume analysis completed successfully!",
+            analysisResult
+          );
+          toast.success(
+            `Resume uploaded and analyzed successfully! Your ATS score is ${analysisResult.score}/100.`,
+            {
+              id: "resume-analysis",
+              duration: 4000,
+              icon: "✅",
+            }
+          );
+        } else {
+          console.warn("Invalid analysis result structure:", analysisResult);
+          toast.error(
+            "Resume uploaded but analysis returned incomplete data. You can still continue with registration.",
+            {
+              id: "resume-analysis",
+              duration: 5000,
+              icon: "⚠️",
+            }
+          );
+        }
       } catch (error: any) {
         console.error("Resume analysis failed:", error);
         toast.error(
@@ -523,14 +570,36 @@ ${
     }
 
     try {
+      // Create a copy of the current resume analysis to preserve it
+      const currentResumeAnalysis = resumeAnalysis.isAnalyzing
+        ? null
+        : user?.profile?.resumeAnalysis ||
+          resumeAnalysis.tempAnalysisData ||
+          null;
+
       // Dispatch the registration action
-      await dispatch(registerUser(formData)).unwrap();
+      const registrationResult = await dispatch(
+        registerUser(formData)
+      ).unwrap();
+
+      // Log information about resume analysis data transfer
+      if (currentResumeAnalysis) {
+        console.log(
+          "Resume analysis data was available during registration:",
+          currentResumeAnalysis
+        );
+        console.log("User after registration:", registrationResult.user);
+      }
 
       // Success message
       toast.success(
         `Registration successful! Welcome to DISHA!${
           formData.resume ? " Your resume has been uploaded successfully." : ""
-        }${formData.avatar ? " Your profile picture has been uploaded." : ""}`,
+        }${formData.avatar ? " Your profile picture has been uploaded." : ""}${
+          currentResumeAnalysis
+            ? ` Your ATS score is ${currentResumeAnalysis.score}/100.`
+            : ""
+        }`,
         {
           icon: "🎉",
           duration: 4000,
@@ -975,12 +1044,19 @@ ${
                               Analysis failed: {resumeAnalysis.error}
                             </span>
                           </div>
-                        ) : user?.profile?.resumeAnalysis ? (
+                        ) : user?.profile?.resumeAnalysis ||
+                          resumeAnalysis.tempAnalysisData ? (
                           <div className="flex items-center px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
                             <CheckCircle className="h-4 w-4 text-green-600 mr-3" />
                             <span className="text-sm text-green-700 font-medium">
                               Analysis complete! ATS Score:{" "}
-                              {user.profile.resumeAnalysis.score}/100
+                              {
+                                (
+                                  user?.profile?.resumeAnalysis ||
+                                  resumeAnalysis.tempAnalysisData
+                                )?.score
+                              }
+                              /100
                             </span>
                           </div>
                         ) : null}
