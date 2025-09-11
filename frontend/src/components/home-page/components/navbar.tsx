@@ -68,11 +68,11 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Left: Brand */}
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-black text-white flex items-center justify-center shadow-sm">
+            {/* <div className="h-8 w-8 rounded-lg bg-black text-white flex items-center justify-center shadow-sm">
               <span className="text-sm font-bold leading-none">IN</span>
-            </div>
+            </div> */}
             <span className="text-lg font-extrabold tracking-tight text-gray-900">
-              InternMatch
+              DISHA
             </span>
           </div>
 

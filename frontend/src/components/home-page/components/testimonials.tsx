@@ -27,7 +27,7 @@ const Testimonials: React.FC<TestimonialsProps> = ({
   const items = [
     {
       quote:
-        "InternMatch helped me find an internship that perfectly matched my skills. As a first-generation college student, I was overwhelmed by the options, but this platform made it so simple!",
+        "DISHA helped me find an internship that perfectly matched my skills. As a first-generation college student, I was overwhelmed by the options, but this platform made it so simple!",
       name: "Priya Sharma",
       title: "Computer Science Student, Rural Maharashtra",
       img: "/2289_SkVNQSBGQU1PIDEwMjgtMTIy.jpg",
