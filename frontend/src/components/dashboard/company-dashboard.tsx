@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
@@ -36,7 +34,15 @@ import {
   AlertCircle,
   Search,
   Filter,
+  ChevronRight,
+  Sparkles,
+  Activity,
+  PieChart,
 } from "lucide-react";
+
+// Import the components
+import JobCreationForm from './dashboardComponents/jobCreate';
+import ApplicationsList from './dashboardComponents/ApplicationList';
 
 const CompanyDashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -45,6 +51,12 @@ const CompanyDashboard = () => {
     (state: RootState) => state.user
   );
   const [activeTab, setActiveTab] = useState("active");
+
+  // Add modal states
+  const [showJobModal, setShowJobModal] = useState(false);
+  const [showApplicationsModal, setShowApplicationsModal] = useState(false);
+  const [selectedJobForApplications, setSelectedJobForApplications] = useState<any>(null);
+  const [createdJobs, setCreatedJobs] = useState<any[]>([]);
 
   // Mock job data
   const mockJobs = [
@@ -130,35 +142,58 @@ const CompanyDashboard = () => {
     },
   ];
 
+  // Combine mock jobs with created jobs
+  const allJobs = [...mockJobs, ...createdJobs];
+
+  // Add handlers for the new functionality
+  const handleCreateJobClick = () => {
+    setShowJobModal(true);
+  };
+
+  const handleJobCreated = (newJob: any) => {
+    setCreatedJobs(prev => [...prev, newJob]);
+    setShowJobModal(false);
+    alert('Job posted successfully!');
+  };
+
   const handleEditJob = (jobId: string) => {
-    // Mock edit functionality
     alert(`Editing job ${jobId}! This would open the job edit form.`);
   };
 
   const handleDeleteJob = (jobId: string) => {
-    // Mock delete functionality
     if (confirm("Are you sure you want to delete this job posting?")) {
+      setCreatedJobs(prev => prev.filter(job => job.id !== jobId));
       alert(`Job ${jobId} deleted successfully!`);
     }
   };
 
   const handleViewApplications = (jobId: string) => {
-    // Mock view applications functionality
-    alert(
-      `Viewing applications for job ${jobId}! This would open the applications list.`
-    );
+    const job = allJobs.find(j => j.id === jobId);
+    if (job) {
+      setSelectedJobForApplications(job);
+      setShowApplicationsModal(true);
+    }
+  };
+
+  const handleViewAllApplications = () => {
+    if (allJobs.length > 0) {
+      setSelectedJobForApplications(allJobs[0]);
+      setShowApplicationsModal(true);
+    } else {
+      alert('No jobs found to view applications!');
+    }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-100 text-green-700 border-green-300";
       case "draft":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-100 text-yellow-700 border-yellow-300";
       case "closed":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-gray-100 text-gray-700 border-gray-300";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-100 text-gray-700 border-gray-300";
     }
   };
 
@@ -177,8 +212,8 @@ const CompanyDashboard = () => {
 
   const filteredJobs =
     activeTab === "all"
-      ? mockJobs
-      : mockJobs.filter((job) => job.status === activeTab);
+      ? allJobs
+      : allJobs.filter((job) => job.status === activeTab);
 
   React.useEffect(() => {
     if (!isAuthenticated) {
@@ -193,10 +228,10 @@ const CompanyDashboard = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-peach border-t-melon mx-auto mb-4"></div>
-          <p className="text-charcoal animate-pulse">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-900 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-700 animate-pulse text-lg font-medium">
             Loading your dashboard...
           </p>
         </div>
@@ -205,42 +240,73 @@ const CompanyDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
+      {/* Job Creation Modal */}
+      {showJobModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl">
+            <JobCreationForm
+              onSubmit={handleJobCreated}
+              onCancel={() => setShowJobModal(false)}
+              isModal={true}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Applications Modal */}
+      {showApplicationsModal && selectedJobForApplications && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden shadow-2xl">
+            <ApplicationsList
+              jobId={selectedJobForApplications.id}
+              jobTitle={selectedJobForApplications.title}
+              onBack={() => setShowApplicationsModal(false)}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Enhanced Header */}
-      <header className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <div className="flex items-center">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-peach rounded-lg flex items-center justify-center">
-                  <Building2 className="h-6 w-6 text-charcoal" />
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Building2 className="h-7 w-7 text-white" />
                 </div>
-                <h1 className="text-2xl font-bold text-charcoal">
-                  InternMatch
-                </h1>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    InternMatch
+                  </h1>
+                  <span className="text-sm text-gray-600 font-medium">
+                    Company Portal
+                  </span>
+                </div>
               </div>
-              <span className="ml-4 px-4 py-2 bg-peach text-charcoal text-sm font-medium rounded-full border border-charcoal/20">
-                Company Portal
-              </span>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="flex items-center px-6 py-2 bg-peach text-charcoal rounded-xl font-medium hover:shadow-lg transition-all duration-200 hover:bg-melon hover:text-white group">
-                <Plus className="h-4 w-4 mr-2 group-hover:rotate-90 transition-transform" />
+              <button 
+                onClick={handleCreateJobClick}
+                className="flex items-center px-6 py-3 bg-gray-900 text-white rounded-2xl font-medium hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl group"
+              >
+                <Plus className="h-4 w-4 mr-2 group-hover:rotate-90 transition-transform duration-200" />
                 Post New Job
               </button>
-              <button className="relative p-2 text-gray-500 hover:text-charcoal transition-all duration-200 hover:bg-peach/30 rounded-lg">
+              <button className="relative p-3 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:bg-gray-100 rounded-xl">
                 <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-melon rounded-full animate-ping"></span>
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-melon rounded-full"></span>
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               </button>
-              <button className="p-2 text-gray-500 hover:text-charcoal transition-all duration-200 hover:bg-peach/30 rounded-lg">
+              <button className="p-3 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:bg-gray-100 rounded-xl">
                 <Settings className="h-5 w-5" />
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center px-4 py-2 text-sm text-charcoal hover:text-melon transition-all duration-200 hover:bg-red-50 rounded-lg group"
+                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:text-red-600 transition-all duration-200 hover:bg-red-50 rounded-xl group"
               >
-                <LogOut className="h-4 w-4 mr-2 group-hover:text-melon transition-colors" />
+                <LogOut className="h-4 w-4 mr-2 group-hover:text-red-600 transition-colors" />
                 Logout
               </button>
             </div>
@@ -254,55 +320,67 @@ const CompanyDashboard = () => {
           {/* Enhanced Company Profile Section */}
           <div className="lg:col-span-1 space-y-6">
             {/* Company Profile Card */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300">
+            <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-8 hover:shadow-xl transition-all duration-300">
               <div className="text-center">
-                <div className="relative w-24 h-24 mx-auto mb-4">
-                  <div className="w-24 h-24 bg-peach rounded-full flex items-center justify-center">
-                    <Building2 className="h-12 w-12 text-charcoal" />
+                <div className="relative w-24 h-24 mx-auto mb-6">
+                  <div className="w-24 h-24 bg-gradient-to-br from-gray-900 to-gray-700 rounded-full flex items-center justify-center shadow-lg">
+                    <Building2 className="h-12 w-12 text-white" />
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 border-4 border-white rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-4 w-4 text-white" />
+                  </div>
                 </div>
-                <h2 className="text-xl font-bold text-charcoal mb-1">
+                <h2 className="text-xl font-bold text-gray-900 mb-2">
                   {user.profile?.companyName || user.name}
                 </h2>
-                <p className="text-gray-600 text-sm capitalize mb-3">
+                <p className="text-gray-600 text-sm capitalize mb-4">
                   {user.profile?.designation || user.role}
                 </p>
                 <div className="flex items-center justify-center">
                   {user.isVerified ? (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                      <Award className="h-3 w-3 mr-1" />✓ Verified Company
+                    <span className="inline-flex items-center px-3 py-2 rounded-2xl text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+                      <Award className="h-3 w-3 mr-2" />
+                      Verified Company
                     </span>
                   ) : (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
-                      <Clock className="h-3 w-3 mr-1" />⚠ Pending Verification
+                    <span className="inline-flex items-center px-3 py-2 rounded-2xl text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-200">
+                      <Clock className="h-3 w-3 mr-2" />
+                      Pending Verification
                     </span>
                   )}
                 </div>
               </div>
 
               {/* Contact Information */}
-              <div className="mt-6 space-y-3">
-                <div className="flex items-center text-sm text-charcoal hover:text-melon transition-colors p-2 rounded-lg hover:bg-peach/20">
-                  <Mail className="h-4 w-4 mr-3 text-melon" />
-                  <span className="truncate">{user.email}</span>
+              <div className="mt-8 space-y-3">
+                <div className="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-xl hover:bg-gray-50 group">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
+                    <Mail className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <span className="truncate font-medium">{user.email}</span>
                 </div>
                 {user.profile?.phone && (
-                  <div className="flex items-center text-sm text-charcoal hover:text-melon transition-colors p-2 rounded-lg hover:bg-peach/20">
-                    <Phone className="h-4 w-4 mr-3 text-melon" />
-                    {user.profile.phone}
+                  <div className="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-xl hover:bg-gray-50 group">
+                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
+                      <Phone className="h-4 w-4 text-gray-600" />
+                    </div>
+                    <span className="font-medium">{user.profile.phone}</span>
                   </div>
                 )}
                 {user.profile?.location && (
-                  <div className="flex items-center text-sm text-charcoal hover:text-melon transition-colors p-2 rounded-lg hover:bg-peach/20">
-                    <MapPin className="h-4 w-4 mr-3 text-melon" />
-                    {user.profile.location}
+                  <div className="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-xl hover:bg-gray-50 group">
+                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
+                      <MapPin className="h-4 w-4 text-gray-600" />
+                    </div>
+                    <span className="font-medium">{user.profile.location}</span>
                   </div>
                 )}
                 {user.profile?.companySize && (
-                  <div className="flex items-center text-sm text-charcoal hover:text-melon transition-colors p-2 rounded-lg hover:bg-peach/20">
-                    <Users className="h-4 w-4 mr-3 text-melon" />
-                    {user.profile.companySize} employees
+                  <div className="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-xl hover:bg-gray-50 group">
+                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
+                      <Users className="h-4 w-4 text-gray-600" />
+                    </div>
+                    <span className="font-medium">{user.profile.companySize} employees</span>
                   </div>
                 )}
               </div>
@@ -310,142 +388,162 @@ const CompanyDashboard = () => {
 
             {/* Company Bio */}
             {user.profile?.bio && (
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300">
-                <h3 className="text-lg font-bold text-charcoal mb-4 flex items-center">
-                  <Building2 className="h-5 w-5 mr-2 text-melon" />
+              <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                    <Building2 className="h-4 w-4 text-gray-600" />
+                  </div>
                   About Company
                 </h3>
-                <p className="text-charcoal leading-relaxed">
+                <p className="text-gray-700 leading-relaxed">
                   {user.profile.bio}
                 </p>
               </div>
             )}
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300">
-              <h3 className="text-lg font-bold text-charcoal mb-4 flex items-center">
-                <Zap className="h-5 w-5 mr-2 text-melon" />
+            <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300">
+              <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
+                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                  <Zap className="h-4 w-4 text-gray-600" />
+                </div>
                 Quick Actions
               </h3>
               <div className="space-y-3">
-                <button className="w-full flex items-center justify-center px-4 py-3 bg-peach text-charcoal rounded-xl font-medium hover:shadow-lg transition-all duration-200 hover:bg-melon hover:text-white group">
-                  <Plus className="h-4 w-4 mr-2 group-hover:rotate-90 transition-transform" />
-                  Create New Job
+                <button 
+                  onClick={handleCreateJobClick}
+                  className="w-full flex items-center justify-between px-4 py-4 bg-gray-900 text-white rounded-2xl font-medium hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl group"
+                >
+                  <div className="flex items-center">
+                    <Plus className="h-4 w-4 mr-3 group-hover:rotate-90 transition-transform duration-200" />
+                    Create New Job
+                  </div>
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button className="w-full flex items-center justify-center px-4 py-3 bg-gray-100 text-charcoal rounded-xl font-medium hover:bg-peach/50 transition-all duration-200">
-                  <Eye className="h-4 w-4 mr-2" />
-                  View All Applications
+                <button 
+                  onClick={handleViewAllApplications}
+                  className="w-full flex items-center justify-between px-4 py-4 bg-gray-100 text-gray-700 rounded-2xl font-medium hover:bg-gray-200 transition-all duration-200 group"
+                >
+                  <div className="flex items-center">
+                    <Eye className="h-4 w-4 mr-3" />
+                    View All Applications
+                  </div>
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button className="w-full flex items-center justify-center px-4 py-3 bg-gray-100 text-charcoal rounded-xl font-medium hover:bg-peach/50 transition-all duration-200">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Analytics Dashboard
+                <button className="w-full flex items-center justify-between px-4 py-4 bg-gray-100 text-gray-700 rounded-2xl font-medium hover:bg-gray-200 transition-all duration-200 group">
+                  <div className="flex items-center">
+                    <BarChart3 className="h-4 w-4 mr-3" />
+                    Analytics Dashboard
+                  </div>
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
           </div>
+
           {/* Enhanced Dashboard Content */}
           <div className="lg:col-span-3 space-y-8">
             {/* Welcome Section */}
-            <div className="bg-peach rounded-2xl shadow-lg p-8 text-charcoal">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-3xl font-bold mb-2 flex items-center">
-                    Welcome back, {user.name.split(" ")[0]}!
-                    <span className="ml-2 animate-bounce">🏢</span>
-                  </h1>
-                  <p className="text-charcoal/80 text-lg">
-                    Ready to find top talent? Manage your internship postings
-                    and connect with the best candidates.
-                  </p>
-                </div>
-                <div className="hidden md:block">
-                  <Building2 className="h-16 w-16 text-charcoal/30" />
+            <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl shadow-lg p-8 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-3xl font-bold mb-3 flex items-center">
+                      Welcome back, {user.name.split(" ")[0]}!
+                      <Sparkles className="ml-3 h-6 w-6 text-yellow-400" />
+                    </h1>
+                    <p className="text-gray-300 text-lg leading-relaxed">
+                      Ready to find top talent? Manage your internship postings
+                      and connect with the best candidates.
+                    </p>
+                  </div>
+                  <div className="hidden md:block">
+                    <Building2 className="h-20 w-20 text-white/20" />
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Enhanced Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-charcoal">
-                      Active Jobs
-                    </p>
-                    <p className="text-3xl font-bold text-charcoal mt-1">
-                      {mockJobs.filter((job) => job.status === "active").length}
-                    </p>
+              {[
+                {
+                  title: "Active Jobs",
+                  value: allJobs.filter((job) => job.status === "active").length,
+                  icon: Briefcase,
+                  color: "bg-blue-500",
+                  bgColor: "bg-blue-50",
+                  textColor: "text-blue-700"
+                },
+                {
+                  title: "Total Applications",
+                  value: allJobs.reduce((acc, job) => acc + (job.applicationsCount || 0), 0),
+                  icon: FileText,
+                  color: "bg-green-500",
+                  bgColor: "bg-green-50",
+                  textColor: "text-green-700"
+                },
+                {
+                  title: "Draft Jobs",
+                  value: allJobs.filter((job) => job.status === "draft").length,
+                  icon: Edit2,
+                  color: "bg-yellow-500",
+                  bgColor: "bg-yellow-50",
+                  textColor: "text-yellow-700"
+                },
+                {
+                  title: "Hired",
+                  value: 5,
+                  icon: Users,
+                  color: "bg-purple-500",
+                  bgColor: "bg-purple-50",
+                  textColor: "text-purple-700"
+                }
+              ].map((stat, index) => (
+                <div key={index} className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`w-12 h-12 ${stat.color} rounded-2xl flex items-center justify-center shadow-lg`}>
+                      <stat.icon className="h-6 w-6 text-white" />
+                    </div>
+                    <div className={`px-3 py-1 ${stat.bgColor} ${stat.textColor} rounded-full text-xs font-semibold`}>
+                      +12%
+                    </div>
                   </div>
-                  <div className="w-12 h-12 bg-peach rounded-xl flex items-center justify-center">
-                    <Briefcase className="h-6 w-6 text-charcoal" />
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900 mb-1">
+                      {stat.value}
+                    </p>
+                    <p className="text-sm font-medium text-gray-600">
+                      {stat.title}
+                    </p>
                   </div>
                 </div>
-              </div>
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-charcoal">
-                      Total Applications
-                    </p>
-                    <p className="text-3xl font-bold text-charcoal mt-1">
-                      {mockJobs.reduce(
-                        (acc, job) => acc + job.applicationsCount,
-                        0
-                      )}
-                    </p>
-                  </div>
-                  <div className="w-12 h-12 bg-peach rounded-xl flex items-center justify-center">
-                    <FileText className="h-6 w-6 text-charcoal" />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-charcoal">
-                      Draft Jobs
-                    </p>
-                    <p className="text-3xl font-bold text-charcoal mt-1">
-                      {mockJobs.filter((job) => job.status === "draft").length}
-                    </p>
-                  </div>
-                  <div className="w-12 h-12 bg-peach rounded-xl flex items-center justify-center">
-                    <Edit2 className="h-6 w-6 text-charcoal" />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-charcoal">Hired</p>
-                    <p className="text-3xl font-bold text-charcoal mt-1">5</p>
-                  </div>
-                  <div className="w-12 h-12 bg-peach rounded-xl flex items-center justify-center">
-                    <Users className="h-6 w-6 text-charcoal" />
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Job Postings Section */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
+            <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 overflow-hidden">
+              <div className="p-8 border-b border-gray-200/50">
+                <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="text-2xl font-bold text-charcoal flex items-center">
-                      <Briefcase className="h-6 w-6 mr-2 text-melon" />
+                    <h3 className="text-2xl font-bold text-gray-900 flex items-center">
+                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                        <Briefcase className="h-5 w-5 text-gray-600" />
+                      </div>
                       Job Postings
                     </h3>
-                    <p className="text-charcoal/70 mt-1">
+                    <p className="text-gray-600 mt-2">
                       Manage your internship opportunities
                     </p>
                   </div>
-                  <div className="flex space-x-2">
-                    <button className="px-4 py-2 bg-peach text-charcoal rounded-xl hover:shadow-lg transition-all duration-200 flex items-center">
+                  <div className="flex space-x-3">
+                    <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-all duration-200 flex items-center font-medium">
                       <Filter className="h-4 w-4 mr-2" />
                       Filters
                     </button>
-                    <button className="px-4 py-2 bg-gray-100 text-charcoal rounded-xl hover:bg-peach/50 transition-all duration-200 flex items-center">
+                    <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-all duration-200 flex items-center font-medium">
                       <Search className="h-4 w-4 mr-2" />
                       Search
                     </button>
@@ -453,42 +551,39 @@ const CompanyDashboard = () => {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex space-x-1 mt-4 bg-gray-100 p-1 rounded-lg">
+                <div className="flex space-x-2 bg-gray-100 p-2 rounded-2xl">
                   {[
                     {
                       key: "active",
                       label: "Active",
-                      count: mockJobs.filter((job) => job.status === "active")
-                        .length,
+                      count: allJobs.filter((job) => job.status === "active").length,
                     },
                     {
                       key: "draft",
                       label: "Draft",
-                      count: mockJobs.filter((job) => job.status === "draft")
-                        .length,
+                      count: allJobs.filter((job) => job.status === "draft").length,
                     },
                     {
                       key: "closed",
                       label: "Closed",
-                      count: mockJobs.filter((job) => job.status === "closed")
-                        .length,
+                      count: allJobs.filter((job) => job.status === "closed").length,
                     },
-                    { key: "all", label: "All", count: mockJobs.length },
+                    { key: "all", label: "All", count: allJobs.length },
                   ].map((tab) => (
                     <button
                       key={tab.key}
                       onClick={() => setActiveTab(tab.key)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
+                      className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-3 ${
                         activeTab === tab.key
-                          ? "bg-white text-charcoal shadow-sm"
-                          : "text-charcoal/60 hover:text-charcoal hover:bg-white/50"
+                          ? "bg-white text-gray-900 shadow-sm"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
                       }`}
                     >
                       <span>{tab.label}</span>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs ${
+                        className={`px-2 py-1 rounded-full text-xs font-bold ${
                           activeTab === tab.key
-                            ? "bg-peach text-charcoal"
+                            ? "bg-gray-100 text-gray-700"
                             : "bg-gray-200 text-gray-600"
                         }`}
                       >
@@ -499,70 +594,69 @@ const CompanyDashboard = () => {
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="p-8">
                 {filteredJobs.length > 0 ? (
                   <div className="space-y-6">
                     {filteredJobs.map((job) => (
                       <div
                         key={job.id}
-                        className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden"
+                        className="bg-gray-50 rounded-3xl border border-gray-200/50 p-8 hover:shadow-lg hover:bg-white transition-all duration-300 group"
                       >
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="flex justify-between items-start mb-6">
                           <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <h4 className="text-xl font-bold text-charcoal">
+                            <div className="flex items-center space-x-4 mb-3">
+                              <h4 className="text-xl font-bold text-gray-900">
                                 {job.title}
                               </h4>
                               <span
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                                className={`inline-flex items-center px-3 py-2 rounded-2xl text-xs font-semibold ${getStatusColor(
                                   job.status
                                 )} border`}
                               >
                                 {getStatusIcon(job.status)}
-                                <span className="ml-1 capitalize">
+                                <span className="ml-2 capitalize">
                                   {job.status}
                                 </span>
                               </span>
                             </div>
-                            <p className="text-lg font-semibold text-charcoal mb-2 flex items-center">
-                              <Building2 className="h-4 w-4 mr-2 text-melon" />
+                            <p className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                              <Building2 className="h-4 w-4 mr-2 text-gray-500" />
                               {job.department} Department
                             </p>
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-charcoal mb-3">
-                              <span className="flex items-center">
-                                <LocationIcon className="h-4 w-4 mr-1 text-melon" />
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-6">
+                              <span className="flex items-center bg-white px-3 py-2 rounded-xl">
+                                <LocationIcon className="h-4 w-4 mr-2 text-gray-500" />
                                 {job.location}
                               </span>
-                              <span className="flex items-center">
-                                <Clock className="h-4 w-4 mr-1 text-melon" />
+                              <span className="flex items-center bg-white px-3 py-2 rounded-xl">
+                                <Clock className="h-4 w-4 mr-2 text-gray-500" />
                                 {job.duration}
                               </span>
-                              <span className="flex items-center">
-                                <IndianRupee className="h-4 w-4 mr-1 text-melon" />
+                              <span className="flex items-center bg-white px-3 py-2 rounded-xl">
+                                <IndianRupee className="h-4 w-4 mr-2 text-gray-500" />
                                 {job.stipend}
                               </span>
-                              <span className="flex items-center">
-                                <Users className="h-4 w-4 mr-1 text-melon" />
-                                {job.applicationsCount} applications
+                              <span className="flex items-center bg-white px-3 py-2 rounded-xl">
+                                <Users className="h-4 w-4 mr-2 text-gray-500" />
+                                {job.applicationsCount || 0} applications
                               </span>
-                              <span className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-1 text-melon" />
-                                Deadline:{" "}
-                                {new Date(job.deadline).toLocaleDateString()}
+                              <span className="flex items-center bg-white px-3 py-2 rounded-xl col-span-2">
+                                <Calendar className="h-4 w-4 mr-2 text-gray-500" />
+                                Deadline: {new Date(job.deadline).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
                         </div>
 
-                        <p className="text-charcoal/70 mb-4 leading-relaxed">
+                        <p className="text-gray-700 mb-6 leading-relaxed">
                           {job.description}
                         </p>
 
-                        <div className="flex flex-wrap gap-2 mb-4">
+                        <div className="flex flex-wrap gap-2 mb-6">
                           {job.skills.map((skill, index) => (
                             <span
                               key={index}
-                              className="px-3 py-1 bg-peach text-charcoal text-xs font-medium rounded-full"
+                              className="px-3 py-2 bg-white text-gray-700 text-sm font-medium rounded-xl border border-gray-200"
                             >
                               {skill}
                             </span>
@@ -570,28 +664,27 @@ const CompanyDashboard = () => {
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <div className="text-xs text-charcoal/60">
-                            Posted on{" "}
-                            {new Date(job.postedDate).toLocaleDateString()}
+                          <div className="text-sm text-gray-500">
+                            Posted on {new Date(job.postedDate).toLocaleDateString()}
                           </div>
-                          <div className="flex space-x-2">
+                          <div className="flex space-x-3">
                             <button
                               onClick={() => handleViewApplications(job.id)}
-                              className="bg-gray-100 text-charcoal px-4 py-2 rounded-xl font-medium hover:bg-peach/50 transition-all duration-200 flex items-center group"
+                              className="bg-white text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-900 hover:text-white transition-all duration-200 flex items-center border border-gray-200 group"
                             >
                               <Eye className="h-4 w-4 mr-2" />
                               View Applications
                             </button>
                             <button
                               onClick={() => handleEditJob(job.id)}
-                              className="bg-peach text-charcoal px-4 py-2 rounded-xl font-medium hover:shadow-lg transition-all duration-200 flex items-center group"
+                              className="bg-gray-900 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-gray-700 transition-all duration-200 flex items-center"
                             >
                               <Edit2 className="h-4 w-4 mr-2" />
                               Edit
                             </button>
                             <button
                               onClick={() => handleDeleteJob(job.id)}
-                              className="bg-red-100 text-red-600 px-4 py-2 rounded-xl font-medium hover:bg-red-200 transition-all duration-200 flex items-center group"
+                              className="bg-red-100 text-red-700 px-6 py-3 rounded-2xl font-semibold hover:bg-red-200 transition-all duration-200 flex items-center border border-red-200"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete
@@ -602,19 +695,22 @@ const CompanyDashboard = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-peach rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Briefcase className="h-8 w-8 text-charcoal" />
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                      <Briefcase className="h-10 w-10 text-gray-400" />
                     </div>
-                    <p className="text-charcoal font-medium mb-2">
+                    <p className="text-xl font-semibold text-gray-900 mb-3">
                       No {activeTab === "all" ? "" : activeTab} jobs found
                     </p>
-                    <p className="text-sm text-charcoal/60 mb-4">
+                    <p className="text-gray-600 mb-8 max-w-md mx-auto">
                       {activeTab === "all"
                         ? "Create your first internship posting to start receiving applications"
                         : `You don't have any ${activeTab} jobs at the moment`}
                     </p>
-                    <button className="bg-peach text-charcoal px-6 py-2 rounded-xl font-medium hover:shadow-lg transition-all duration-200 hover:bg-melon hover:text-white">
+                    <button 
+                      onClick={handleCreateJobClick}
+                      className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-semibold hover:bg-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
                       Create New Job
                     </button>
                   </div>
@@ -623,46 +719,54 @@ const CompanyDashboard = () => {
             </div>
 
             {/* Enhanced Analytics Section */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-charcoal flex items-center">
-                  <TrendingUp className="h-6 w-6 mr-2 text-melon" />
+            <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-8 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                    <TrendingUp className="h-5 w-5 text-gray-600" />
+                  </div>
                   Analytics Overview
                 </h3>
-                <button className="px-4 py-2 bg-peach text-charcoal rounded-xl hover:shadow-lg transition-all duration-200 flex items-center">
+                <button className="px-6 py-3 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-all duration-200 flex items-center font-semibold">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   View Detailed Report
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-4 rounded-xl bg-peach/20">
-                  <div className="w-12 h-12 bg-peach rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Target className="h-6 w-6 text-charcoal" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[
+                  {
+                    title: "Application Success Rate",
+                    value: "87%",
+                    icon: Target,
+                    color: "bg-blue-500",
+                    bgColor: "bg-blue-50"
+                  },
+                  {
+                    title: "Average Company Rating",
+                    value: "4.8",
+                    icon: Star,
+                    color: "bg-green-500",
+                    bgColor: "bg-green-50"
+                  },
+                  {
+                    title: "Average Response Time",
+                    value: "3.2 days",
+                    icon: Clock,
+                    color: "bg-purple-500",
+                    bgColor: "bg-purple-50"
+                  }
+                ].map((analytic, index) => (
+                  <div key={index} className={`text-center p-6 rounded-3xl ${analytic.bgColor} border border-gray-200/50`}>
+                    <div className={`w-14 h-14 ${analytic.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}>
+                      <analytic.icon className="h-7 w-7 text-white" />
+                    </div>
+                    <p className="text-3xl font-bold text-gray-900 mb-2">{analytic.value}</p>
+                    <p className="text-sm font-semibold text-gray-600">
+                      {analytic.title}
+                    </p>
                   </div>
-                  <p className="text-2xl font-bold text-charcoal">87%</p>
-                  <p className="text-sm text-charcoal/70">
-                    Application Success Rate
-                  </p>
-                </div>
-                <div className="text-center p-4 rounded-xl bg-green-50">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Star className="h-6 w-6 text-green-600" />
-                  </div>
-                  <p className="text-2xl font-bold text-charcoal">4.8</p>
-                  <p className="text-sm text-charcoal/70">
-                    Average Company Rating
-                  </p>
-                </div>
-                <div className="text-center p-4 rounded-xl bg-blue-50">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Clock className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <p className="text-2xl font-bold text-charcoal">3.2 days</p>
-                  <p className="text-sm text-charcoal/70">
-                    Average Response Time
-                  </p>
-                </div>
+                ))}
               </div>
             </div>
           </div>
