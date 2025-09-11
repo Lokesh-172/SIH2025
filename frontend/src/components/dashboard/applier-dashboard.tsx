@@ -262,28 +262,30 @@ const ApplierDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Enhanced Header */}
+      {/* Enhanced Header - Mobile Optimized */}
       <header className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16 sm:h-20">
             <div className="flex items-center">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Briefcase className="h-7 w-7 text-white" />
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                  <Briefcase className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">DISHA</h1>
-                  <span className="text-sm text-gray-600 font-medium">
+                <div className="hidden xs:block">
+                  <h1 className="text-lg sm:text-2xl font-bold text-gray-900">
+                    DISHA
+                  </h1>
+                  <span className="text-xs sm:text-sm text-gray-600 font-medium">
                     Student Portal
                   </span>
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              {/* Skills Assessment Button */}
+            <div className="flex items-center space-x-1 sm:space-x-4">
+              {/* Skills Assessment Button - Responsive */}
               <button
                 onClick={() => setShowQuiz(true)}
-                className="flex items-center px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl group"
+                className="hidden sm:flex items-center px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl group"
               >
                 <Brain className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
                 {user.profile?.quizResults &&
@@ -291,46 +293,53 @@ const ApplierDashboard = () => {
                   ? "Retake Quiz"
                   : "Take Skills Quiz"}
               </button>
-              <button className="relative p-3 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:bg-gray-100 rounded-xl">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+              {/* Mobile Quiz Button */}
+              <button
+                onClick={() => setShowQuiz(true)}
+                className="sm:hidden p-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl shadow-lg"
+              >
+                <Brain className="h-4 w-4" />
               </button>
-              <button className="p-3 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:bg-gray-100 rounded-xl">
+              <button className="relative p-2 sm:p-3 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:bg-gray-100 rounded-xl">
+                <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-ping"></span>
+                <span className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full"></span>
+              </button>
+              <button className="hidden sm:block p-3 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:bg-gray-100 rounded-xl">
                 <Settings className="h-5 w-5" />
               </button>
               <button
                 onClick={handleLogout}
-                className="cursor-pointer flex items-center px-4 py-3 text-sm text-gray-700 hover:text-red-600 transition-all duration-200 hover:bg-red-50 rounded-xl group"
+                className="cursor-pointer flex items-center px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-700 hover:text-red-600 transition-all duration-200 hover:bg-red-50 rounded-xl group"
               >
-                <LogOut className="h-4 w-4 mr-2 group-hover:text-red-600 transition-colors" />
-                Logout
+                <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 group-hover:text-red-600 transition-colors" />
+                <span className="hidden xs:inline">Logout</span>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Enhanced Profile Section */}
-          <div className="lg:col-span-1 space-y-6">
+      {/* Main Content - Mobile Optimized */}
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-8">
+          {/* Enhanced Profile Section - Mobile Optimized */}
+          <div className="lg:col-span-1 space-y-4 sm:space-y-6">
             {/* Profile Card */}
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-8 hover:shadow-xl transition-all duration-300">
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-gray-200/50 p-4 sm:p-8 hover:shadow-xl transition-all duration-300">
               <div className="text-center">
-                <div className="relative w-24 h-24 mx-auto mb-6">
-                  <div className="w-24 h-24 bg-gradient-to-br from-gray-900 to-gray-700 rounded-full flex items-center justify-center shadow-lg">
-                    <User className="h-12 w-12 text-white" />
+                <div className="relative w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-gray-900 to-gray-700 rounded-full flex items-center justify-center shadow-lg">
+                    <User className="h-8 w-8 sm:h-12 sm:w-12 text-white" />
                   </div>
-                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 border-4 border-white rounded-full flex items-center justify-center">
-                    <CheckCircle className="h-4 w-4 text-white" />
+                  <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 border-2 sm:border-4 border-white rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                   </div>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 sm:mb-2">
                   {user.name}
                 </h2>
-                <p className="text-gray-600 text-sm capitalize mb-4">
+                <p className="text-gray-600 text-xs sm:text-sm capitalize mb-3 sm:mb-4">
                   {user.role}
                 </p>
                 <div className="flex items-center justify-center">
@@ -349,25 +358,25 @@ const ApplierDashboard = () => {
               </div>
 
               {/* Contact Information */}
-              <div className="mt-8 space-y-3">
-                <div className="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-xl hover:bg-gray-50 group">
-                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
-                    <Mail className="h-4 w-4 text-gray-600" />
+              <div className="mt-6 sm:mt-8 space-y-2 sm:space-y-3">
+                <div className="flex items-center text-xs sm:text-sm text-gray-700 hover:text-gray-900 transition-colors p-2 sm:p-3 rounded-xl hover:bg-gray-50 group">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-2 sm:mr-3 group-hover:bg-gray-200 transition-colors">
+                    <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                   </div>
                   <span className="truncate font-medium">{user.email}</span>
                 </div>
                 {user.profile?.phone && (
-                  <div className="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-xl hover:bg-gray-50 group">
-                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
-                      <Phone className="h-4 w-4 text-gray-600" />
+                  <div className="flex items-center text-xs sm:text-sm text-gray-700 hover:text-gray-900 transition-colors p-2 sm:p-3 rounded-xl hover:bg-gray-50 group">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-2 sm:mr-3 group-hover:bg-gray-200 transition-colors">
+                      <Phone className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                     </div>
                     <span className="font-medium">{user.profile.phone}</span>
                   </div>
                 )}
                 {user.profile?.location && (
-                  <div className="flex items-center text-sm text-gray-700 hover:text-gray-900 transition-colors p-3 rounded-xl hover:bg-gray-50 group">
-                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
-                      <MapPin className="h-4 w-4 text-gray-600" />
+                  <div className="flex items-center text-xs sm:text-sm text-gray-700 hover:text-gray-900 transition-colors p-2 sm:p-3 rounded-xl hover:bg-gray-50 group">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-2 sm:mr-3 group-hover:bg-gray-200 transition-colors">
+                      <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                     </div>
                     <span className="font-medium">{user.profile.location}</span>
                   </div>
@@ -376,38 +385,38 @@ const ApplierDashboard = () => {
 
               {/* Academic Information */}
               {user.profile?.college && (
-                <div className="mt-8 pt-6 border-t border-gray-200/50">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center">
-                    <div className="w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center mr-2">
+                <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50">
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 rounded-lg flex items-center justify-center mr-2">
                       <GraduationCap className="h-3 w-3 text-gray-600" />
                     </div>
                     Academic Information
                   </h3>
-                  <div className="space-y-3 text-sm text-gray-700">
-                    <div className="flex items-center p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
-                        <Building className="h-4 w-4 text-gray-600" />
+                  <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-700">
+                    <div className="flex items-center p-2 sm:p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-2 sm:mr-3 group-hover:bg-gray-200 transition-colors">
+                        <Building className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                       </div>
-                      <span className="font-medium">
+                      <span className="font-medium text-xs sm:text-sm">
                         {user.profile.college}
                       </span>
                     </div>
                     {user.profile.course && (
-                      <div className="flex items-center p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
-                          <BookOpen className="h-4 w-4 text-gray-600" />
+                      <div className="flex items-center p-2 sm:p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-2 sm:mr-3 group-hover:bg-gray-200 transition-colors">
+                          <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                         </div>
-                        <span className="font-medium">
+                        <span className="font-medium text-xs sm:text-sm">
                           {user.profile.course}
                         </span>
                       </div>
                     )}
                     {user.profile.graduationYear && (
-                      <div className="flex items-center p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
-                          <Calendar className="h-4 w-4 text-gray-600" />
+                      <div className="flex items-center p-2 sm:p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-2 sm:mr-3 group-hover:bg-gray-200 transition-colors">
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                         </div>
-                        <span className="font-medium">
+                        <span className="font-medium text-xs sm:text-sm">
                           Class of {user.profile.graduationYear}
                         </span>
                       </div>
@@ -417,27 +426,27 @@ const ApplierDashboard = () => {
               )}
             </div>
 
-            {/* Resume Score Section */}
+            {/* Resume Score Section - Mobile Optimized */}
             {user.profile?.resumeAnalysis && (
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl shadow-lg border border-green-200/50 p-6 hover:shadow-xl transition-all duration-300">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                    <Award className="h-4 w-4 text-green-600" />
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl sm:rounded-3xl shadow-lg border border-green-200/50 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+                    <Award className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
                   </div>
                   Resume ATS Score
                 </h3>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
                   <div className="flex items-center">
-                    <div className="text-3xl font-bold text-green-600 mr-2">
+                    <div className="text-2xl sm:text-3xl font-bold text-green-600 mr-2">
                       {user.profile.resumeAnalysis.score}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-xs sm:text-sm text-gray-600">
                       <div>/ 100</div>
                       <div className="text-xs">ATS Score</div>
                     </div>
                   </div>
                   <div
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${
                       user.profile.resumeAnalysis.score >= 80
                         ? "bg-green-100 text-green-700"
                         : user.profile.resumeAnalysis.score >= 60
@@ -464,15 +473,15 @@ const ApplierDashboard = () => {
                     style={{ width: `${user.profile.resumeAnalysis.score}%` }}
                   ></div>
                 </div>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 leading-relaxed">
                   {user.profile.resumeAnalysis.overall_feedback}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-col xs:flex-row gap-2">
                   <button
                     onClick={() => setShowQuiz(true)}
-                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center group"
+                    className="flex-1 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-xl text-xs sm:text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center group"
                   >
-                    <Brain className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
+                    <Brain className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 group-hover:scale-110 transition-transform" />
                     {user.profile?.quizResults &&
                     user.profile.quizResults.length > 0
                       ? "Retake Quiz"
@@ -480,12 +489,12 @@ const ApplierDashboard = () => {
                   </button>
                   <button
                     onClick={() => setShowResumeAnalysis(true)}
-                    className="px-4 py-2 bg-white text-green-600 border border-green-200 rounded-xl text-sm font-medium hover:bg-green-50 transition-colors"
+                    className="px-3 sm:px-4 py-2 bg-white text-green-600 border border-green-200 rounded-xl text-xs sm:text-sm font-medium hover:bg-green-50 transition-colors"
                   >
                     View Details
                   </button>
                 </div>
-                <div className="text-xs text-gray-500 mt-3">
+                <div className="text-xs text-gray-500 mt-2 sm:mt-3">
                   Analyzed on{" "}
                   {new Date(
                     user.profile.resumeAnalysis.analyzedAt
@@ -602,37 +611,37 @@ const ApplierDashboard = () => {
             </div>
           </div>
 
-          {/* Enhanced Dashboard Content */}
-          <div className="lg:col-span-3 space-y-8">
+          {/* Enhanced Dashboard Content - Mobile Optimized */}
+          <div className="lg:col-span-3 space-y-4 sm:space-y-8">
             {/* Welcome Section */}
-            <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl shadow-lg p-8 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+            <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl sm:rounded-3xl shadow-lg p-4 sm:p-8 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-white/10 rounded-full -translate-y-10 translate-x-10 sm:-translate-y-16 sm:translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/5 rounded-full translate-y-8 -translate-x-8 sm:translate-y-12 sm:-translate-x-12"></div>
               <div className="relative z-10">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="text-3xl font-bold mb-3 flex items-center">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <div className="mb-4 sm:mb-0">
+                    <h1 className="text-xl sm:text-3xl font-bold mb-2 sm:mb-3 flex items-center">
                       Welcome back, {user.name.split(" ")[0]}!
-                      <Sparkles className="ml-3 h-6 w-6 text-yellow-400" />
+                      <Sparkles className="ml-2 sm:ml-3 h-4 w-4 sm:h-6 sm:w-6 text-yellow-400" />
                     </h1>
-                    <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                    <p className="text-gray-300 text-sm sm:text-lg leading-relaxed mb-4 sm:mb-6">
                       Ready to discover exciting internship opportunities? Let's
                       get you matched with the perfect role.
                     </p>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex flex-col xs:flex-row items-start xs:items-center space-y-2 xs:space-y-0 xs:space-x-4">
                       {/* Resume Score Display */}
                       {user.profile?.resumeAnalysis && (
-                        <div className="flex items-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-sm">
+                        <div className="flex items-center px-3 sm:px-4 py-2 sm:py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl sm:rounded-2xl shadow-sm">
                           <div className="flex items-center">
-                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
-                              <Award className="h-5 w-5 text-white" />
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center mr-2 sm:mr-3">
+                              <Award className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                             </div>
                             <div>
-                              <div className="flex items-center space-x-2">
-                                <span className="text-lg font-bold text-white">
+                              <div className="flex items-center space-x-1 sm:space-x-2">
+                                <span className="text-base sm:text-lg font-bold text-white">
                                   {user.profile.resumeAnalysis.score}
                                 </span>
-                                <span className="text-sm text-gray-300">
+                                <span className="text-xs sm:text-sm text-gray-300">
                                   /100
                                 </span>
                               </div>
@@ -647,14 +656,14 @@ const ApplierDashboard = () => {
                       {/* Quiz Score Display */}
                       {user.profile?.quizResults &&
                         user.profile.quizResults.length > 0 && (
-                          <div className="flex items-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-sm">
+                          <div className="flex items-center px-3 sm:px-4 py-2 sm:py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl sm:rounded-2xl shadow-sm">
                             <div className="flex items-center">
-                              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
-                                <Trophy className="h-5 w-5 text-white" />
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center mr-2 sm:mr-3">
+                                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                               </div>
                               <div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-lg font-bold text-white">
+                                <div className="flex items-center space-x-1 sm:space-x-2">
+                                  <span className="text-base sm:text-lg font-bold text-white">
                                     {
                                       user.profile.quizResults[
                                         user.profile.quizResults.length - 1
@@ -674,26 +683,29 @@ const ApplierDashboard = () => {
                       {/* Skills Assessment Button */}
                       <button
                         onClick={() => setShowQuiz(true)}
-                        className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-2xl font-medium hover:bg-white/30 transition-all duration-200 border border-white/20"
+                        className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl sm:rounded-2xl font-medium hover:bg-white/30 transition-all duration-200 border border-white/20 text-sm sm:text-base"
                       >
-                        <Brain className="h-4 w-4 mr-2" />
-                        {user.profile?.quizResults &&
-                        user.profile.quizResults.length > 0
-                          ? "Retake Quiz"
-                          : "Take Skills Quiz"}
-                        <ChevronRight className="h-4 w-4 ml-2" />
+                        <Brain className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="hidden xs:inline">
+                          {user.profile?.quizResults &&
+                          user.profile.quizResults.length > 0
+                            ? "Retake Quiz"
+                            : "Take Skills Quiz"}
+                        </span>
+                        <span className="xs:hidden">Quiz</span>
+                        <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                       </button>
                     </div>
                   </div>
-                  <div className="hidden md:block">
-                    <Target className="h-20 w-20 text-white/20" />
+                  <div className="hidden sm:block">
+                    <Target className="h-12 w-12 sm:h-20 sm:w-20 text-white/20" />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Enhanced Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Enhanced Quick Stats - Mobile Optimized */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
               {[
                 {
                   title: "Applications",
@@ -730,25 +742,25 @@ const ApplierDashboard = () => {
               ].map((stat, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-3xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                  className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-gray-200/50 p-3 sm:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
                     <div
-                      className={`w-12 h-12 ${stat.color} rounded-2xl flex items-center justify-center shadow-lg`}
+                      className={`w-8 h-8 sm:w-12 sm:h-12 ${stat.color} rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg`}
                     >
-                      <stat.icon className="h-6 w-6 text-white" />
+                      <stat.icon className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                     </div>
                     <div
-                      className={`px-3 py-1 ${stat.bgColor} ${stat.textColor} rounded-full text-xs font-semibold`}
+                      className={`px-2 py-1 sm:px-3 sm:py-1 ${stat.bgColor} ${stat.textColor} rounded-full text-xs font-semibold`}
                     >
                       +5%
                     </div>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 mb-1">
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900 mb-1">
                       {stat.value}
                     </p>
-                    <p className="text-sm font-medium text-gray-600">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">
                       {stat.title}
                     </p>
                   </div>
