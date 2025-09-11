@@ -41,7 +41,12 @@ import {
   Eye,
   Send,
   Plus,
+  Brain,
+  Trophy,
 } from "lucide-react";
+
+// Import Quiz component (assuming it's in a separate file)
+import Quiz from "../quiz/quiz"; // Adjust the path as needed
 
 const ApplierDashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -52,6 +57,53 @@ const ApplierDashboard = () => {
   const [activeTab, setActiveTab] = useState("recommended");
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [appliedJobs, setAppliedJobs] = useState<string[]>(["1"]);
+  const [showQuiz, setShowQuiz] = useState(false);
+
+  // Sample quiz questions for skills assessment
+  const quizQuestions = [
+    {
+      id: 1,
+      question: "What is the primary purpose of React Hooks?",
+      options: [
+        "To replace class components entirely",
+        "To manage state and lifecycle in functional components",
+        "To improve performance of React applications",
+        "To handle routing in React applications"
+      ],
+      correctAnswer: 1,
+      difficulty: "medium" as const,
+      category: "React",
+      explanation: "React Hooks allow you to use state and other React features in functional components."
+    },
+    {
+      id: 2,
+      question: "Which of the following is NOT a valid JavaScript data type?",
+      options: [
+        "undefined",
+        "boolean",
+        "float",
+        "symbol"
+      ],
+      correctAnswer: 2,
+      difficulty: "easy" as const,
+      category: "JavaScript",
+      explanation: "JavaScript doesn't have a specific 'float' data type. Numbers are all of type 'number'."
+    },
+    {
+      id: 3,
+      question: "What is the time complexity of binary search?",
+      options: [
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      correctAnswer: 1,
+      difficulty: "hard" as const,
+      category: "Data Structures",
+      explanation: "Binary search has O(log n) time complexity because it divides the search space in half."
+    }
+  ];
 
   // Mock recommended jobs data
   const [recommendedJobs, setRecommendedJobs] = useState([
@@ -151,6 +203,17 @@ const ApplierDashboard = () => {
     }
   };
 
+  const handleQuizComplete = (score: number, answers: number[], timeTaken: number) => {
+    console.log("Quiz completed!", { score, answers, timeTaken });
+    setShowQuiz(false);
+    // You can add logic here to save the quiz results to the user's profile
+    alert(`Quiz completed! Your score: ${score}%`);
+  };
+
+  const handleQuizClose = () => {
+    setShowQuiz(false);
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -161,6 +224,20 @@ const ApplierDashboard = () => {
           </p>
         </div>
       </div>
+    );
+  }
+
+  // Show Quiz if active
+  if (showQuiz) {
+    return (
+      <Quiz
+        title="Skills Assessment Quiz"
+        description="Boost your profile with a skills assessment to get better job matches"
+        questions={quizQuestions}
+        timeLimit={15}
+        onComplete={handleQuizComplete}
+        onClose={handleQuizClose}
+      />
     );
   }
 
@@ -186,6 +263,14 @@ const ApplierDashboard = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              {/* Skills Assessment Button */}
+              <button
+                onClick={() => setShowQuiz(true)}
+                className="flex items-center px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl group"
+              >
+                <Brain className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
+                Take Skills Quiz
+              </button>
               <button className="relative p-3 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:bg-gray-100 rounded-xl">
                 <Bell className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
@@ -352,6 +437,19 @@ const ApplierDashboard = () => {
                 Quick Actions
               </h3>
               <div className="space-y-3">
+                <button 
+                  onClick={() => setShowQuiz(true)}
+                  className="w-full flex items-center justify-between px-4 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl group"
+                >
+                  <div className="flex items-center">
+                    <Brain className="h-4 w-4 mr-3 group-hover:scale-110 transition-transform" />
+                    Skills Assessment
+                  </div>
+                  <div className="flex items-center">
+                    <Trophy className="h-4 w-4 mr-2" />
+                    <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </button>
                 <button className="w-full flex items-center justify-between px-4 py-4 bg-gray-900 text-white rounded-2xl font-medium hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl group">
                   <div className="flex items-center">
                     <Search className="h-4 w-4 mr-3" />
@@ -375,6 +473,29 @@ const ApplierDashboard = () => {
                 </button>
               </div>
             </div>
+
+            {/* Skills Assessment Prompt Card */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl shadow-lg border border-blue-200/50 p-6 hover:shadow-xl transition-all duration-300">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <Brain className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  Boost Your Profile
+                </h3>
+                <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                  Take our skills assessment quiz to get better job matches and showcase your abilities to employers.
+                </p>
+                <button
+                  onClick={() => setShowQuiz(true)}
+                  className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl group"
+                >
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Start Assessment
+                  <Sparkles className="h-4 w-4 ml-2 group-hover:scale-110 transition-transform" />
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Enhanced Dashboard Content */}
@@ -390,10 +511,18 @@ const ApplierDashboard = () => {
                       Welcome back, {user.name.split(" ")[0]}!
                       <Sparkles className="ml-3 h-6 w-6 text-yellow-400" />
                     </h1>
-                    <p className="text-gray-300 text-lg leading-relaxed">
+                    <p className="text-gray-300 text-lg leading-relaxed mb-4">
                       Ready to discover exciting internship opportunities? Let's
                       get you matched with the perfect role.
                     </p>
+                    <button
+                      onClick={() => setShowQuiz(true)}
+                      className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-2xl font-medium hover:bg-white/30 transition-all duration-200 border border-white/20"
+                    >
+                      <Brain className="h-4 w-4 mr-2" />
+                      Take Skills Quiz
+                      <ChevronRight className="h-4 w-4 ml-2" />
+                    </button>
                   </div>
                   <div className="hidden md:block">
                     <Target className="h-20 w-20 text-white/20" />
@@ -459,6 +588,7 @@ const ApplierDashboard = () => {
               ))}
             </div>
 
+            {/* Rest of your existing content remains the same... */}
             {/* Job Recommendations Section */}
             <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 overflow-hidden">
               <div className="p-8 border-b border-gray-200/50">
