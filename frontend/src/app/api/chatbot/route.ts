@@ -2,25 +2,36 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, resume_data } = await request.json();
-    console.log("Received request:", { message, has_resume: !!resume_data });
+    const { message, resume_data, user_profile } = await request.json();
+    console.log("Received request:", {
+      message,
+      has_resume: !!resume_data,
+      has_user_profile: !!user_profile,
+      user_email: user_profile?.email || "not provided",
+      user_name: user_profile?.name || "not provided",
+      has_resume_analysis: !!user_profile?.resume_analysis,
+      has_quiz_results: !!user_profile?.quiz_results?.length,
+      user_skills_count: user_profile?.skills?.length || 0,
+    });
 
     // Generate dynamic session ID if not provided
     const sessionId = `session_${Date.now()}_${Math.random()
       .toString(36)
       .substr(2, 9)}`;
     // Determine the FastAPI backend URL based on environment
-    const isDevelopment = process.env.NODE_ENV === 'development';
+    const isDevelopment = process.env.NODE_ENV === "development";
     let fastApiUrl: string;
-    
+
     if (isDevelopment) {
       // In development, always use localhost
-      fastApiUrl = 'http://localhost:8001';
+      fastApiUrl = "http://localhost:8001";
     } else {
       // In production, use environment variable or throw error
       const productionUrl = process.env.FASTAPI_BASE_URL;
       if (!productionUrl) {
-        console.error("FASTAPI_BASE_URL environment variable is required in production");
+        console.error(
+          "FASTAPI_BASE_URL environment variable is required in production"
+        );
         throw new Error("FastAPI backend URL not configured for production");
       }
       fastApiUrl = productionUrl;
@@ -29,13 +40,15 @@ export async function POST(request: NextRequest) {
     console.log("Environment info:", {
       NODE_ENV: process.env.NODE_ENV,
       isDevelopment,
-      fastApiUrl: isDevelopment ? fastApiUrl : `${fastApiUrl.substring(0, 20)}...`,
-      hasCustomUrl: !!process.env.FASTAPI_BASE_URL
+      fastApiUrl: isDevelopment
+        ? fastApiUrl
+        : `${fastApiUrl.substring(0, 20)}...`,
+      hasCustomUrl: !!process.env.FASTAPI_BASE_URL,
     });
 
     // Connect to your existing FastAPI backend
     console.log(`Attempting to connect to FastAPI at: ${fastApiUrl}/chat`);
-    
+
     const response = await fetch(`${fastApiUrl}/chat`, {
       method: "POST",
       headers: {
@@ -45,13 +58,14 @@ export async function POST(request: NextRequest) {
         message,
         session_id: sessionId,
         resume_data: resume_data || null,
+        user_profile: user_profile || null,
       }),
     }).catch((error) => {
       console.log("FastAPI request failed:", {
         url: `${fastApiUrl}/chat`,
         error: error.message,
         isDevelopment,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Fallback if FastAPI backend is not available
@@ -76,9 +90,9 @@ export async function POST(request: NextRequest) {
         status: response?.status,
         statusText: response?.statusText,
         url: `${fastApiUrl}/chat`,
-        fallbackUsed: true
+        fallbackUsed: true,
       });
-      
+
       // Fallback response when FastAPI backend is not available
       const fallbackResponse = getFallbackResponse(message);
       return NextResponse.json({ response: fallbackResponse });

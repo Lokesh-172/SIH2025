@@ -13,7 +13,11 @@ interface ChatbotContextType {
   messages: Message[];
   isOpen: boolean;
   isTyping: boolean;
-  sendMessage: (text: string, resumeData?: any) => Promise<void>;
+  sendMessage: (
+    text: string,
+    resumeData?: any,
+    userProfile?: any
+  ) => Promise<void>;
   toggleChatbot: () => void;
   clearMessages: () => void;
 }
@@ -46,10 +50,16 @@ export const ChatbotProvider: React.FC<ChatbotProviderProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
-  const sendMessage = async (text: string, resumeData?: any) => {
+  const sendMessage = async (
+    text: string,
+    resumeData?: any,
+    userProfile?: any
+  ) => {
     console.log("🚀 [ChatbotContext] Sending message:", {
       message: text,
       hasResumeData: !!resumeData,
+      hasUserProfile: !!userProfile,
+      userEmail: userProfile?.email || "not provided",
       resumeData: resumeData,
       timestamp: new Date().toISOString(),
     });
@@ -68,6 +78,7 @@ export const ChatbotProvider: React.FC<ChatbotProviderProps> = ({
       const requestPayload = {
         message: text,
         resume_data: resumeData || null,
+        user_profile: userProfile || null,
       };
 
       console.log("📤 [ChatbotContext] Request payload:", requestPayload);
