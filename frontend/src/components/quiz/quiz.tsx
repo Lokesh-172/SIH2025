@@ -399,21 +399,7 @@ const Quiz: React.FC<QuizProps> = ({
                 <Clock className="h-4 w-4 mr-2" />
                 {formatTime(timeLeft)}
               </div>
-              {isActive ? (
-                <button
-                  onClick={() => setIsActive(false)}
-                  className="p-2 bg-yellow-100 text-yellow-700 rounded-xl hover:bg-yellow-200 transition-colors"
-                >
-                  <Pause className="h-4 w-4" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsActive(true)}
-                  className="p-2 bg-green-100 text-green-700 rounded-xl hover:bg-green-200 transition-colors"
-                >
-                  <Play className="h-4 w-4" />
-                </button>
-              )}
+
             </div>
           </div>
 

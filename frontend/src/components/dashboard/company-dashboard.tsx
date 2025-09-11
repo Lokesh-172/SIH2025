@@ -36,8 +36,6 @@ import {
   Filter,
   ChevronRight,
   Sparkles,
-  Activity,
-  PieChart,
 } from "lucide-react";
 
 // Import the components
@@ -304,7 +302,7 @@ const CompanyDashboard = () => {
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:text-red-600 transition-all duration-200 hover:bg-red-50 rounded-xl group"
+                className="cursor-pointer flex items-center px-4 py-3 text-sm text-gray-700 hover:text-red-600 transition-all duration-200 hover:bg-red-50 rounded-xl group"
               >
                 <LogOut className="h-4 w-4 mr-2 group-hover:text-red-600 transition-colors" />
                 Logout

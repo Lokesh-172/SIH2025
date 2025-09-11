@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
@@ -13,11 +13,15 @@ interface NavbarProps {
 const navigationItems = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Browse Internships", href: "/internships" },
+  { label: "Companies", href: "/login?type=company" },
   { label: "About", href: "/about" },
   { label: "Contact Us", href: "/contact-us" },
 ];
 
-function useOutsideClose<T extends HTMLElement>(open: boolean, onClose: () => void) {
+function useOutsideClose<T extends HTMLElement>(
+  open: boolean,
+  onClose: () => void
+) {
   const ref = React.useRef<T | null>(null);
   React.useEffect(() => {
     if (!open) return;
@@ -43,9 +47,14 @@ function useOutsideClose<T extends HTMLElement>(open: boolean, onClose: () => vo
 const Navbar: React.FC<NavbarProps> = ({ className }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const pathname = usePathname();
-
+  const router = useRouter();
+  const handleHomeClick = () => {
+    router.push("/");
+  };
   // Hook for closing menu on outside click
-  const menuRef = useOutsideClose<HTMLDivElement>(isOpen, () => setIsOpen(false));
+  const menuRef = useOutsideClose<HTMLDivElement>(isOpen, () =>
+    setIsOpen(false)
+  );
 
   const cn = (...classes: (string | undefined)[]) => {
     return classes.filter(Boolean).join(" ");
@@ -67,7 +76,10 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Left: Brand */}
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={handleHomeClick}
+          >
             {/* <div className="h-8 w-8 rounded-lg bg-black text-white flex items-center justify-center shadow-sm">
               <span className="text-sm font-bold leading-none">IN</span>
             </div> */}
@@ -77,57 +89,60 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
           </div>
 
           {/* Center: Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8" aria-label="Primary">
-            <Link 
-              href="/" 
+          <nav
+            className="hidden md:flex items-center gap-8"
+            aria-label="Primary"
+          >
+            <Link
+              href="/"
               className={cn(
                 "font-medium transition-colors",
-                isActive("/") 
-                  ? "text-gray-900" 
+                isActive("/")
+                  ? "text-gray-900"
                   : "text-gray-500 hover:text-gray-900"
               )}
             >
               Home
             </Link>
-            <Link 
-              href="/internships" 
+            <Link
+              href="/internships"
               className={cn(
                 "font-medium transition-colors",
-                isActive("/internships") 
-                  ? "text-gray-900" 
+                isActive("/internships")
+                  ? "text-gray-900"
                   : "text-gray-500 hover:text-gray-900"
               )}
             >
               Browse Internships
             </Link>
-            <Link 
-              href="/companies" 
+            <Link
+              href="/login?type=company"
               className={cn(
                 "font-medium transition-colors",
-                isActive("/companies") 
-                  ? "text-gray-900" 
+                isActive("/companies") || isActive("/login")
+                  ? "text-gray-900"
                   : "text-gray-500 hover:text-gray-900"
               )}
             >
               Companies
             </Link>
-            <Link 
-              href="/about" 
+            <Link
+              href="/about"
               className={cn(
                 "font-medium transition-colors",
-                isActive("/about") 
-                  ? "text-gray-900" 
+                isActive("/about")
+                  ? "text-gray-900"
                   : "text-gray-500 hover:text-gray-900"
               )}
             >
               About
             </Link>
-            <Link 
-              href="/contact" 
+            <Link
+              href="/contact"
               className={cn(
                 "font-medium transition-colors",
-                isActive("/contact") 
-                  ? "text-gray-900" 
+                isActive("/contact")
+                  ? "text-gray-900"
                   : "text-gray-500 hover:text-gray-900"
               )}
             >

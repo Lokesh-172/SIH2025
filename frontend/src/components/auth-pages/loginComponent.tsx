@@ -11,7 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppDispatch, RootState } from "@/lib/store";
 import { loginUser, clearError } from "@/slice/user-slice";
 import { demoCredentials } from "@/data/mockLoginCredentials";
@@ -35,6 +35,7 @@ const GridPattern = () => (
 const LoginForm = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { loginLoading, error, isAuthenticated, user } = useSelector(
     (state: RootState) => state.user
   );
@@ -46,6 +47,14 @@ const LoginForm = () => {
   });
   const [userType, setUserType] = useState<"student" | "company">("student");
   const [showDemoCredentials, setShowDemoCredentials] = useState(false);
+
+  // Set initial user type based on URL parameter
+  useEffect(() => {
+    const typeParam = searchParams.get("type");
+    if (typeParam === "company") {
+      setUserType("company");
+    }
+  }, [searchParams]);
 
   // Redirect user after successful login
   useEffect(() => {
@@ -147,21 +156,21 @@ const LoginForm = () => {
               <button
                 type="button"
                 onClick={() => setShowDemoCredentials(!showDemoCredentials)}
-                className="text-sm bg-blue-50 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
+                className="text-sm bg-purple-50 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100 transition-colors"
               >
                 🎯 Use Demo Credentials
               </button>
 
               {showDemoCredentials && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-sm text-blue-800 mb-3 font-medium">
+                <div className="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <p className="text-sm text-purple-700 mb-3 font-medium">
                     Quick Demo Access:
                   </p>
                   <div className="space-y-2">
                     <button
                       type="button"
                       onClick={() => fillDemoCredentials("student")}
-                      className="w-full text-left px-3 py-2 text-sm bg-white border border-blue-200 rounded hover:bg-blue-50 transition-colors"
+                      className="w-full text-left px-3 py-2 text-sm bg-white border border-purple-200 rounded hover:bg-purple-50 transition-colors"
                     >
                       <span className="font-medium">Student:</span>{" "}
                       john.student@gmail.com
@@ -169,7 +178,7 @@ const LoginForm = () => {
                     <button
                       type="button"
                       onClick={() => fillDemoCredentials("company")}
-                      className="w-full text-left px-3 py-2 text-sm bg-white border border-blue-200 rounded hover:bg-blue-50 transition-colors"
+                      className="w-full text-left px-3 py-2 text-sm bg-white border border-purple-200 rounded hover:bg-purple-50 transition-colors"
                     >
                       <span className="font-medium">Company:</span>{" "}
                       hr@techcorp.com
@@ -177,7 +186,7 @@ const LoginForm = () => {
                     <button
                       type="button"
                       onClick={() => fillDemoCredentials("admin")}
-                      className="w-full text-left px-3 py-2 text-sm bg-white border border-blue-200 rounded hover:bg-blue-50 transition-colors"
+                      className="w-full text-left px-3 py-2 text-sm bg-white border border-purple-200 rounded hover:bg-purple-50 transition-colors"
                     >
                       <span className="font-medium">Admin:</span>{" "}
                       admin@DISHA.com
@@ -205,7 +214,7 @@ const LoginForm = () => {
                 onClick={() => setUserType("company")}
                 className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   userType === "company"
-                    ? "bg-blue-600 text-white shadow-md transform scale-105"
+                    ? "bg-purple-500 text-white shadow-md transform scale-105"
                     : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                 }`}
               >
@@ -292,7 +301,7 @@ const LoginForm = () => {
                 className={`w-full flex items-center justify-center px-6 py-4 rounded-lg text-lg font-semibold shadow-lg transition-colors hover:transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
                   userType === "student"
                     ? "bg-gray-900 text-white hover:bg-gray-800"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-purple-500 text-white hover:bg-purple-600"
                 }`}
               >
                 {loginLoading ? (
@@ -317,7 +326,7 @@ const LoginForm = () => {
                 Don't have an account yet?{" "}
                 <button
                   onClick={() => router.push("/sign-up")}
-                  className="text-gray-900 font-semibold hover:text-gray-700 transition-colors"
+                  className="cursor-pointer underline text-gray-900 font-semibold hover:text-gray-700 transition-colors"
                 >
                   Create your account
                 </button>
